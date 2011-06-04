@@ -70,6 +70,8 @@ nrn/src
 nrn/src/*
 nrn/x86
 nrn/x86/*
+nrn/hoc_e
+nrn/nocmodl
 
 neurodroid/assets
 neurodroid/assets/*
@@ -84,6 +86,8 @@ neurodroid/obj/*
 
 .DS_Store
 .AppleDouble
+
+commit.sh
 
 syntax: regexp
 .*\#.*\#$

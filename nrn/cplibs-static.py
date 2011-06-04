@@ -5,6 +5,20 @@ import shutil
 import sys
 import subprocess
 
+nrnlib = "./x86/bin/nrniv"
+newfn = "../neurodroid/assets/nrniv"
+sys.stdout.write("Copying %s to %s\n" % (nrnlib, newfn))
+shutil.copyfile(nrnlib, newfn)
+
+p = subprocess.Popen("/usr/bin/zip -r lib.zip *", cwd="/home/cs/Dropbox/nrn-android/nrn/share/nrn", shell=True)
+p.wait()
+nrnlib = "./share/nrn/lib.zip"
+newfn = "../neurodroid/assets/lib.zip"
+sys.stdout.write("Copying %s to %s\n" % (nrnlib, newfn))
+shutil.copyfile(nrnlib, newfn)
+
+# The below is only necessary when NEURON is used as a library backend.
+
 # nrnlibs=glob.glob("./x86/lib/*.a")
 # for nrnlib in nrnlibs:
 #     newfn = "../neurodroid/jni/prebuilt/%s" % nrnlib[10:]
@@ -32,14 +46,3 @@ import subprocess
 # sys.stdout.write("Copying %s to %s\n" % (nrnlib, newfn))
 # shutil.copyfile(nrnlib, newfn)
 
-nrnlib = "./x86/bin/nrniv"
-newfn = "../neurodroid/assets/nrniv"
-sys.stdout.write("Copying %s to %s\n" % (nrnlib, newfn))
-shutil.copyfile(nrnlib, newfn)
-
-p = subprocess.Popen("/usr/bin/zip -r lib.zip *", cwd="/home/cs/Dropbox/nrn-android/nrn/share/nrn", shell=True)
-p.wait()
-nrnlib = "./share/nrn/lib.zip"
-newfn = "../neurodroid/assets/lib.zip"
-sys.stdout.write("Copying %s to %s\n" % (nrnlib, newfn))
-shutil.copyfile(nrnlib, newfn)

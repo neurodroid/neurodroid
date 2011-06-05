@@ -11,3 +11,5 @@ make install
 ./config-arm-nrn.sh 1
 make -j4
 make install
+
+./cplibs-static.py

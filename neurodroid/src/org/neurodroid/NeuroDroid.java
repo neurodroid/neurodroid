@@ -9,6 +9,10 @@ package org.neurodroid;
 import java.io.*;
 import java.util.Enumeration;
 import java.util.Scanner;
+import java.util.Map;
+import java.util.List;
+import java.util.Arrays;
+import java.util.concurrent.CountDownLatch;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
@@ -22,6 +26,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.util.Log;
 import android.content.Intent;
+import android.content.DialogInterface;
 
 public class NeuroDroid extends Activity
 {
@@ -29,7 +34,7 @@ public class NeuroDroid extends Activity
     private boolean supportsVfp;
     private CheckBox chkEnableVfp;
     
-    private String nrnoutput, nrnversion, curHocFile;
+    private String nrnoutput="", nrnversion, curHocFile;
     private static final String CACHEDIR = "/data/data/org.neurodroid/cache";
     private static final String BINDIR = "/data/data/org.neurodroid";
     private static final String NRNBIN = BINDIR + "/nrniv";
@@ -38,7 +43,7 @@ public class NeuroDroid extends Activity
     private static final int REQUEST_SAVE=0, REQUEST_LOAD=1;
     private ProgressDialog pd;
     private TextView tv;
-    
+
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState)
@@ -94,6 +99,14 @@ public class NeuroDroid extends Activity
                     tv.setText(nrnversion + "\n" + nrnoutput);
                 }});
 
+        /* Benchmark */
+        Button buttonBenchmark = (Button)findViewById(R.id.btnBenchmark);
+        buttonBenchmark.setOnClickListener(new OnClickListener() {
+                public void onClick(View v) {
+                    runBenchmark(v);
+                }
+            });
+
         /* Enable vfp extension */
         chkEnableVfp = (CheckBox)findViewById(R.id.chkEnableVfp);
         if (supportsVfp) {
@@ -119,18 +132,55 @@ public class NeuroDroid extends Activity
         
         /* Check whether we need to install the std lib */
         if (!(new File(NRNHOME + "/lib/hoc/stdlib.hoc")).exists()) {
-            pd =  ProgressDialog.show(this,
+            final ProgressDialog pd2 =  ProgressDialog.show(this,
                                       "Please wait...", "Installing standard library...", true);
             new Thread(new Runnable(){
                     public void run(){
                         installStdLib();
-                        pd.dismiss();
+                        runOnUiThread(new Runnable(){
+                                @Override
+                                    public void run() {
+                                    if(pd2.isShowing())
+                                        pd2.dismiss();
+                                }
+                            });
                     }
                 }).start();
         }
         tv.setText(nrnversion);
     }
-
+    
+    public void runBenchmark(View v) {
+        tv.setText(nrnversion + "\n" + "Running benchmark...");
+        tv.invalidate();
+        final CountDownLatch cdl = new CountDownLatch(1);
+        final ProgressDialog pd2 =  ProgressDialog.show(this,
+                                                        "Please wait...", "Running benchmark...", true);
+        new Thread(new Runnable(){
+                public void run(){
+                    String bmfile = CACHEDIR+"/benchmark.hoc";
+                    saveAssetsFile("benchmark.hoc", bmfile);
+                    String[] cmdlist = {NRNBIN, bmfile};
+                    nrnoutput = runBinary(cmdlist);
+                    runOnUiThread(new Runnable(){
+                            @Override
+                                public void run() {
+                                if(pd2.isShowing())
+                                    pd2.dismiss();
+                            }
+                        });
+                    cdl.countDown();
+                }
+            }).start();
+        try {
+            cdl.await();
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+            
+        tv.setText(nrnversion + "\n" + nrnoutput);
+    }
+    
     public boolean cpuSupportsVfp() throws IOException {
         /* Read cpu info */
         FileInputStream fis = new FileInputStream("/proc/cpuinfo");
@@ -190,14 +240,18 @@ public class NeuroDroid extends Activity
      */
     public String runBinary(String[] binName, boolean stderr) {
         try {
-            // Executes the command.
-            String[] envp = {"NEURONHOME=" + NRNHOME};
             File binDir = new File(BINDIR);
             if (!binDir.exists()) {
                 binDir.mkdirs();
             }
-            Process process = Runtime.getRuntime().exec(binName, envp, binDir);
 
+            List binNameList = Arrays.asList(binName);
+            /* Process process = Runtime.getRuntime().exec(binName, envp, binDir);*/
+            ProcessBuilder pb = new ProcessBuilder(binNameList).directory(binDir);
+            Map<String, String> env = pb.environment();
+            env.put("NEURONHOME", NRNHOME);
+
+            Process process = pb.start();
             // Waits for the command to finish.
             process.waitFor();
 

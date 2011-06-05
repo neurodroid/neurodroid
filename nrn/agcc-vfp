@@ -50,10 +50,11 @@ my @include_paths = (
       "-I$NDK/platforms/$TARGET/arch-arm/usr/include");
 
 my @preprocess_args = (
-    "-D__ARM_ARCH_5__",
-    "-D__ARM_ARCH_5T__",
-    "-D__ARM_ARCH_5E__",
-    "-D__ARM_ARCH_5TE__", # Already defined by toolchain
+    # We probably don't want these for armv7?
+    # "-D__ARM_ARCH_5__",
+    # "-D__ARM_ARCH_5T__",
+    # "-D__ARM_ARCH_5E__",
+    # "-D__ARM_ARCH_5TE__", # Already defined by toolchain
     "-DANDROID",
     "-DSK_RELEASE",
     "-DNDEBUG",
@@ -80,7 +81,7 @@ my @compile_args = (
     "-fmessage-length=0"); # No line length limit to error messages
 
 my @optimize_args = (
-    "-O2",
+    "-O3",
     "-finline-functions",
     "-finline-limit=300",
     "-fno-inline-functions-called-once",

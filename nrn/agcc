@@ -48,24 +48,6 @@ my $TOOLCHAIN = "$NDK/toolchains/arm-linux-androideabi-4.4.3/prebuilt/linux-x86"
 
 my @include_paths = (
       "-I$NDK/platforms/$TARGET/arch-arm/usr/include");
-    # "-I$DROID/system/core/include",
-    # "-I$DROID/hardware/libhardware/include",
-    # "-I$DROID/hardware/ril/include",
-    # "-I$DROID/dalvik/libnativehelper/include",
-    # "-I$DROID/frameworks/base/include",
-    # "-I$DROID/external/skia/include",
-    # "-I$DROID/out/target/product/generic/obj/include",
-    # "-I$DROID/bionic/libc/arch-arm/include",
-    # "-I$DROID/bionic/libc/include",
-    # "-I$DROID/bionic/libstdc++/include",
-    # "-I$DROID/bionic/libc/kernel/common",
-    # "-I$DROID/bionic/libc/kernel/arch-arm",
-    # "-I$DROID/bionic/libm/include",
-    # "-I$DROID/bionic/libm/include/arch/arm",
-    # "-I$DROID/bionic/libthread_db/include",
-    # "-I$DROID/bionic/libm/arm",
-    # "-I$DROID/bionic/libm",
-    # "-I$DROID/out/target/product/generic/obj/SHARED_LIBRARIES/libm_intermediates");
 
 my @preprocess_args = (
     "-D__ARM_ARCH_5__",
@@ -115,7 +97,7 @@ my @link_args = (
     "-Wl,-dynamic-linker,/system/bin/linker",
     "-Wl,--gc-sections",
     "-Wl,-z,nocopyreloc",
-    # "-Wl,--no-undefined",
+    "-Wl,--no-undefined",
     "-Wl,-rpath-link=$ALIB",
     "-L$ALIB",
     "-nostdlib",
@@ -136,7 +118,7 @@ my @shared_args = (
     "-Wl,--no-whole-archive",
     "-lc",
     "-lm",
-    # "-Wl,--no-undefined",
+    "-Wl,--no-undefined",
     # "$TOOLCHAIN/lib/gcc/arm-linux-androideabi/4.4.3/libgcc.a",
     "-lgcc",
     "-Wl,--whole-archive"); # .a, .o input files go *after* here

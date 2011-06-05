@@ -60,6 +60,10 @@ nrn/nrn-hg/*
 
 # build output directories
 
+nrn/armeabi
+nrn/armeabi/*
+nrn/armeabi-v7a
+nrn/armeabi-v7a/*
 nrn/bin
 nrn/bin/*
 nrn/include

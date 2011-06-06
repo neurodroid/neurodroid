@@ -20,6 +20,8 @@ for arch in archs:
 
     cpfile("./%s/x86/bin/nrniv" % arch, "../neurodroid/assets/%s/nrniv" % arch)
 
+cpfile("benchmark.hoc", "../neurodroid/assets/benchmark.hoc")
+
 # Seemingly there's nothing architecture-dependent in the library so that we only need to do this once:
 p = subprocess.Popen("/usr/bin/zip -r lib.zip *", cwd="./armeabi/share/nrn", shell=True)
 p.wait()

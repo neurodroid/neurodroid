@@ -1,0 +1,3 @@
+y = startsw()
+for i=1,10000000 { x = sin(.2) }
+print "Benchmark completed in ", stopsw(), "s"

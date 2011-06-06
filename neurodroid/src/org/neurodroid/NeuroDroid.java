@@ -153,9 +153,8 @@ public class NeuroDroid extends Activity
     public void runBenchmark(View v) {
         tv.setText(nrnversion + "\n" + "Running benchmark...");
         tv.invalidate();
-        final CountDownLatch cdl = new CountDownLatch(1);
-        final ProgressDialog pd2 =  ProgressDialog.show(this,
-                                                        "Please wait...", "Running benchmark...", true);
+        final ProgressDialog pd2 = ProgressDialog.show(this,
+                                                       "Please wait...", "Running benchmark...", true);
         new Thread(new Runnable(){
                 public void run(){
                     String bmfile = CACHEDIR+"/benchmark.hoc";
@@ -167,18 +166,12 @@ public class NeuroDroid extends Activity
                                 public void run() {
                                 if(pd2.isShowing())
                                     pd2.dismiss();
+                                tv.setText(nrnversion + "\n" + nrnoutput);
                             }
                         });
-                    cdl.countDown();
                 }
             }).start();
-        try {
-            cdl.await();
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
             
-        tv.setText(nrnversion + "\n" + nrnoutput);
     }
     
     public boolean cpuSupportsVfp() throws IOException {

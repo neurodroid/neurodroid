@@ -166,7 +166,7 @@ public class NeuroDroid extends Activity
                                 public void run() {
                                 if(pd2.isShowing())
                                     pd2.dismiss();
-                                tv.setText(nrnversion + "\n" + nrnoutput);
+                                tv.setText(nrnversion + "\n" + nrnoutput + cpuInfo());
                             }
                         });
                 }
@@ -195,6 +195,20 @@ public class NeuroDroid extends Activity
         }
         
         return vfp;
+    }
+
+    public String cpuInfo() {
+        StringBuffer strContent = new StringBuffer("");
+        try {
+            FileInputStream fis = new FileInputStream("/proc/cpuinfo");
+            int ch;
+            while( (ch = fis.read()) != -1)
+                strContent.append((char)ch);
+        } catch (IOException e) {
+            Log.e(TAG, "Couldn't read /proc/cpuinfo");
+            return "";
+        }
+        return strContent.toString();
     }
     
     /* Copy an assets file to the cache directory */

@@ -74,6 +74,8 @@ nrn/src
 nrn/src/*
 nrn/x86
 nrn/x86/*
+nrn/x86_64
+nrn/x86_64/*
 nrn/hoc_e
 nrn/nocmodl
 

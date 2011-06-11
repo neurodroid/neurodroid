@@ -239,13 +239,17 @@ public class NeuroDroid extends Activity
     }
 
     public String runBinary(String[] binName) {
-        return runBinary(binName, false);
+        return runBinary(binName, false, false);
+    }
+
+    public String runBinary(String[] binName, boolean stderr) {
+        return runBinary(binName, stderr, false);
     }
 
     /* Run a binary using binDir as the wd. Return stdout
      * and optinally stderr
      */
-    public String runBinary(String[] binName, boolean stderr) {
+    public String runBinary(String[] binName, boolean stderr, boolean interactive) {
         try {
             File binDir = new File(BINDIR);
             if (!binDir.exists()) {
@@ -301,8 +305,24 @@ public class NeuroDroid extends Activity
         u.setMode(UnZip.EXTRACT);
 
         u.unZip(newfn, NRNHOME);
+
+        /* Make cleanup executable */
+        String cleanup = NRNHOME + "/lib/cleanup";
+        String[] chmodlist = {getChmod(), "744", cleanup};
+        String chmodout = runBinary(chmodlist);
     }
 
+    public String getChmod() {
+        String chmod = "/system/bin/chmod";
+        if (!(new File(chmod)).exists()) {
+            chmod = "/system/xbin/chmod";
+            if (!(new File(chmod)).exists()) {
+                throw new RuntimeException("Couldn't find chmod on your system");
+            }
+        }
+        return chmod;
+    }
+    
     /* Called upon exit from the file dialog */
     public synchronized void onActivityResult(final int requestCode,
                                               int resultCode, final Intent data) {
@@ -341,15 +361,7 @@ public class NeuroDroid extends Activity
             saveAssetsFile("armeabi/nrniv", NRNBIN);
         }
 
-        /* Check for chmod */
-        String chmod = "/system/bin/chmod";
-        if (!(new File(chmod)).exists()) {
-            chmod = "/system/xbin/chmod";
-            if (!(new File(chmod)).exists()) {
-                throw new RuntimeException("Couldn't find chmod on your system");
-            }
-        }
-        String[] chmodlist = {chmod, "744", NRNBIN};
+        String[] chmodlist = {getChmod(), "744", NRNBIN};
         String chmodout = runBinary(chmodlist);
     }
     

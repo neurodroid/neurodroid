@@ -34,6 +34,9 @@ import android.content.DialogInterface;
 public class NeuroDroid extends Activity
 {
 
+    public String fHoc;
+    public ProgressDialog pd2;
+    
     private boolean supportsVfp;
     private CheckBox chkEnableVfp;
     
@@ -133,18 +136,18 @@ public class NeuroDroid extends Activity
                     } else {
                         if (NeuroDroid.this.chkEnableVfp.isChecked()) {
                             cpNrnBin(true);
-                            Toast.makeText(NeuroDroid.this, "vfp support enabled", Toast.LENGTH_LONG).show();
+                            Toast.makeText(NeuroDroid.this, "vfp support enabled", Toast.LENGTH_SHORT).show();
                         } else {
                             cpNrnBin(false);
-                            Toast.makeText(NeuroDroid.this, "vfp support disabled", Toast.LENGTH_LONG).show();
+                            Toast.makeText(NeuroDroid.this, "vfp support disabled", Toast.LENGTH_SHORT).show();
                         }
                     }
                 }});
 
         /* Check whether we need to install the std lib */
         if (!(new File(NRNHOME + "/lib/hoc/stdlib.hoc")).exists()) {
-            final ProgressDialog pd2 =  ProgressDialog.show(this,
-                                      "Please wait...", "Installing standard library...", true);
+            pd2 =  ProgressDialog.show(this,
+                                       "Please wait...", "Installing standard library...", true);
             new Thread(new Runnable(){
                     public void run(){
                         installStdLib();
@@ -185,38 +188,23 @@ public class NeuroDroid extends Activity
     }
     
     public void runBenchmark(View v) {
-        tv.setText(nrnversion + "\n" + "Running benchmark...");
-        tv.invalidate();
-        final ProgressDialog pd2 = ProgressDialog.show(this,
-                                                       "Please wait...", "Running benchmark...", true);
-        new Thread(new Runnable(){
-                public void run(){
-                    String bmfile = CACHEDIR+"/benchmark.hoc";
-                    saveAssetsFile("benchmark.hoc", bmfile);
-                    String[] cmdlist = {NRNBIN, bmfile};
-                    nrnoutput = runBinary(cmdlist);
-                    runOnUiThread(new Runnable(){
-                            @Override
-                                public void run() {
-                                if(pd2.isShowing())
-                                    pd2.dismiss();
-                                tv.setText(nrnversion + "\n" + nrnoutput + "\n" + cpuInfo());
-                            }
-                        });
-                }
-            }).start();
-            
+        runHoc("Running benchmark...", "benchmark.hoc");
     }
     
     public void runSquid(View v) {
-        tv.setText(nrnversion + "\n" + "Running squid AP simulation...");
+        runHoc("Running squid AP simulation...", "squid.hoc");
+    }
+
+    public void runHoc(String msg, String hocfile) {
+        tv.setText(nrnversion + "\n" + msg);
         tv.invalidate();
-        final ProgressDialog pd2 = ProgressDialog.show(this,
-                                                       "Please wait...", "Running squid AP simulation...", true);
+        pd2 = ProgressDialog.show(this,
+                                  "Please wait...", msg, true);
+        fHoc = hocfile;
         new Thread(new Runnable(){
                 public void run(){
-                    String bmfile = CACHEDIR+"/squid.hoc";
-                    saveAssetsFile("squid.hoc", bmfile);
+                    String bmfile = CACHEDIR + "/" + fHoc;
+                    saveAssetsFile(fHoc, bmfile);
                     String[] cmdlist = {NRNBIN, bmfile};
                     nrnoutput = runBinary(cmdlist);
                     runOnUiThread(new Runnable(){

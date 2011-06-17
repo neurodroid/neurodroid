@@ -55,11 +55,11 @@ public class Preferences extends PreferenceActivity {
                     } else {
                         if (chkEnableVfp.isChecked()) {
                             /* NeuroDroid.cpNrnBin(true); */
-                            Toast.makeText(Preferences.this, "vfp support enabled", Toast.LENGTH_LONG).show();
+                            Toast.makeText(Preferences.this, "vfp support enabled", Toast.LENGTH_SHORT).show();
                             return true;
                         } else {
                             /* NeuroDroid.cpNrnBin(false); */
-                            Toast.makeText(Preferences.this, "vfp support disabled", Toast.LENGTH_LONG).show();
+                            Toast.makeText(Preferences.this, "vfp support disabled", Toast.LENGTH_SHORT).show();
                             return false;
                         }
                     }

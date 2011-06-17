@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<PreferenceScreen
+    xmlns:android="http://schemas.android.com/apk/res/android">
+  
+  <CheckBoxPreference
+      android:key="checkbox_vfp"
+      android:title="@string/title_vfp_checkbox"
+      android:summary="@string/summary_vfp_checkbox" />
+  
+</PreferenceScreen>

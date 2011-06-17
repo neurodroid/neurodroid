@@ -23,6 +23,9 @@ import android.widget.Toast;
 import android.widget.CheckBox;
 import android.os.Bundle;
 import android.view.View;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.MenuInflater;
 import android.view.View.OnClickListener;
 import android.util.Log;
 import android.content.Intent;
@@ -107,6 +110,14 @@ public class NeuroDroid extends Activity
                 }
             });
 
+        /* Squid AP */
+        Button buttonSquid = (Button)findViewById(R.id.btnSquid);
+        buttonSquid.setOnClickListener(new OnClickListener() {
+                public void onClick(View v) {
+                    runSquid(v);
+                }
+            });
+
         /* Enable vfp extension */
         chkEnableVfp = (CheckBox)findViewById(R.id.chkEnableVfp);
         if (supportsVfp) {
@@ -129,7 +140,7 @@ public class NeuroDroid extends Activity
                         }
                     }
                 }});
-        
+
         /* Check whether we need to install the std lib */
         if (!(new File(NRNHOME + "/lib/hoc/stdlib.hoc")).exists()) {
             final ProgressDialog pd2 =  ProgressDialog.show(this,
@@ -149,6 +160,29 @@ public class NeuroDroid extends Activity
         }
         tv.setText(nrnversion);
     }
+
+    /** Creates an options menu */
+    @Override
+        public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu, menu);
+        return true;
+    }
+
+    /** Opens the options menu */
+    @Override
+        public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle item selection
+        switch (item.getItemId()) {
+         case R.id.preferences:
+             Intent settingsActivity = new Intent(getBaseContext(),
+                                                  Preferences.class);
+             startActivity(settingsActivity);
+             return true;
+         default:
+             return super.onOptionsItemSelected(item);
+        }
+    }
     
     public void runBenchmark(View v) {
         tv.setText(nrnversion + "\n" + "Running benchmark...");
@@ -166,7 +200,7 @@ public class NeuroDroid extends Activity
                                 public void run() {
                                 if(pd2.isShowing())
                                     pd2.dismiss();
-                                tv.setText(nrnversion + "\n" + nrnoutput + cpuInfo());
+                                tv.setText(nrnversion + "\n" + nrnoutput + "\n" + cpuInfo());
                             }
                         });
                 }
@@ -174,7 +208,31 @@ public class NeuroDroid extends Activity
             
     }
     
-    public boolean cpuSupportsVfp() throws IOException {
+    public void runSquid(View v) {
+        tv.setText(nrnversion + "\n" + "Running squid AP simulation...");
+        tv.invalidate();
+        final ProgressDialog pd2 = ProgressDialog.show(this,
+                                                       "Please wait...", "Running squid AP simulation...", true);
+        new Thread(new Runnable(){
+                public void run(){
+                    String bmfile = CACHEDIR+"/squid.hoc";
+                    saveAssetsFile("squid.hoc", bmfile);
+                    String[] cmdlist = {NRNBIN, bmfile};
+                    nrnoutput = runBinary(cmdlist);
+                    runOnUiThread(new Runnable(){
+                            @Override
+                                public void run() {
+                                if(pd2.isShowing())
+                                    pd2.dismiss();
+                                tv.setText(nrnversion + "\n" + nrnoutput);
+                            }
+                        });
+                }
+            }).start();
+            
+    }
+    
+    public static boolean cpuSupportsVfp() throws IOException {
         /* Read cpu info */
         FileInputStream fis = new FileInputStream("/proc/cpuinfo");
         Scanner scanner = new Scanner(fis);
@@ -312,7 +370,7 @@ public class NeuroDroid extends Activity
         String chmodout = runBinary(chmodlist);
     }
 
-    public String getChmod() {
+    public static String getChmod() {
         String chmod = "/system/bin/chmod";
         if (!(new File(chmod)).exists()) {
             chmod = "/system/xbin/chmod";

@@ -43,15 +43,23 @@
         android:typeface="normal">
     </Button>
 
-    <CheckBox 
-        android:layout_width="wrap_content" 
+    <Button
+        android:id="@+id/btnSquid" 
+        android:text="Squid AP simulation" 
         android:layout_height="wrap_content" 
-        android:id="@+id/chkEnableVfp" 
-        android:text="Enable vfp support" 
-        android:checked="true">
-    </CheckBox>
+        android:layout_width="wrap_content" 
+        android:typeface="normal">
+    </Button>
 
   </LinearLayout>
+
+  <CheckBox 
+      android:layout_width="wrap_content" 
+      android:layout_height="wrap_content" 
+      android:id="@+id/chkEnableVfp" 
+      android:text="Enable vfp support" 
+      android:checked="true">
+  </CheckBox>
 
   <TextView
       android:id="@+id/txtOutput" 

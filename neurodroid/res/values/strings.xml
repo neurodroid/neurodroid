@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">neurodroid</string>
-    <string name="fb_name">filebrowser</string>
+    <string name="fb_name">File Browser</string>
+    <string name="pref_name">Neurodroid preferences</string>
     <string name="location">Location</string>
     <string name="cant_read_folder">folder can\'t be read!</string>
     <string name="nnew">New</string>
@@ -10,5 +11,9 @@
     <string name="cancel">Cancel</string>
     <string name="create">Create</string>
     <string name="no_data">No Data</string>
-	<color name="gray">#ffff0000</color>
+    <string name="preferences">Preferences</string>
+    <string name="title_vfp_checkbox">vfp</string>
+    <string name="summary_vfp_checkbox">Enable vfp support</string>
+
+    <color name="gray">#ffff0000</color>
 </resources>

@@ -17,19 +17,28 @@ import java.util.concurrent.CountDownLatch;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.app.AlertDialog;
+
 import android.widget.TextView;
 import android.widget.Button;
 import android.widget.Toast;
 import android.widget.CheckBox;
+import android.widget.PopupWindow;
+
 import android.os.Bundle;
+
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MenuInflater;
 import android.view.View.OnClickListener;
+
 import android.util.Log;
+
 import android.content.Intent;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
+
+import android.preference.PreferenceManager;
 
 public class NeuroDroid extends Activity
 {
@@ -46,10 +55,10 @@ public class NeuroDroid extends Activity
     private static final String NRNBIN = BINDIR + "/nrniv";
     private static final String NRNHOME = BINDIR + "/nrnhome";
     private static final String TAG = "neurodroid";
-    private static final int REQUEST_SAVE=0, REQUEST_LOAD=1;
+    private static final int REQUEST_SAVE=0, REQUEST_LOAD=1, REQUEST_PREFS=2;
     private ProgressDialog pd;
     private TextView tv;
-
+    
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState)
@@ -64,6 +73,8 @@ public class NeuroDroid extends Activity
             cacheDir.mkdirs();
         }
 
+        tv = (TextView)findViewById(R.id.txtOutput);
+        
         /* Check whether the cpu supports vfp instructions */
         supportsVfp = false;
         try {
@@ -72,11 +83,15 @@ public class NeuroDroid extends Activity
             Toast.makeText(this, "Couldn't read cpu info", Toast.LENGTH_SHORT).show();
             supportsVfp = false;
         }
-        
-        tv = (TextView)findViewById(R.id.txtOutput);
 
-        /* Copy the nrniv binary to binDir and make executable */
-        cpNrnBin(supportsVfp);
+        /* Get previous vfp state */
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        boolean prevVfp = prefs.getBoolean("checkbox_vfp", true);
+        
+        /* Copy the nrniv binary to binDir and make executable.
+         * Use vfp only if it's both supported and enabled in the preferences.
+         */
+        cpNrnBin(supportsVfp && prevVfp);
         
         /* Get version information from NEURON */
         String[] cmdlist = {NRNBIN, "-c", "print nrnversion()"};
@@ -121,29 +136,6 @@ public class NeuroDroid extends Activity
                 }
             });
 
-        /* Enable vfp extension */
-        chkEnableVfp = (CheckBox)findViewById(R.id.chkEnableVfp);
-        if (supportsVfp) {
-            chkEnableVfp.setChecked(true);
-        } else {
-            chkEnableVfp.setChecked(false);
-        }
-        chkEnableVfp.setOnClickListener(new OnClickListener() {
-                public void onClick(View v) {
-                    if (!NeuroDroid.this.supportsVfp) {
-                        NeuroDroid.this.chkEnableVfp.setChecked(false);
-                        Toast.makeText(NeuroDroid.this, "Your cpu doesn't support vfp instructions", Toast.LENGTH_LONG).show();
-                    } else {
-                        if (NeuroDroid.this.chkEnableVfp.isChecked()) {
-                            cpNrnBin(true);
-                            Toast.makeText(NeuroDroid.this, "vfp support enabled", Toast.LENGTH_SHORT).show();
-                        } else {
-                            cpNrnBin(false);
-                            Toast.makeText(NeuroDroid.this, "vfp support disabled", Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                }});
-
         /* Check whether we need to install the std lib */
         if (!(new File(NRNHOME + "/lib/hoc/stdlib.hoc")).exists()) {
             pd2 =  ProgressDialog.show(this,
@@ -180,7 +172,7 @@ public class NeuroDroid extends Activity
          case R.id.preferences:
              Intent settingsActivity = new Intent(getBaseContext(),
                                                   Preferences.class);
-             startActivity(settingsActivity);
+             startActivityForResult(settingsActivity, REQUEST_PREFS);
              return true;
          default:
              return super.onOptionsItemSelected(item);
@@ -193,6 +185,14 @@ public class NeuroDroid extends Activity
     
     public void runSquid(View v) {
         runHoc("Running squid AP simulation...", "squid.hoc");
+        /*
+        float[] values = new float[] { 2.0f,1.5f, 2.5f, 1.0f , 3.0f };
+        String[] verlabels = new String[] { "great", "ok", "bad" };
+        String[] horlabels = new String[] { "today", "tomorrow", "next week", "next month" };
+        
+        GraphView gv = new GraphView(this, values, "GraphViewDemo",horlabels, verlabels, GraphView.BAR);
+        PopupWindow pw = new PopupWindow(gv);
+          pw.show(v);*/
     }
 
     public void runHoc(String msg, String hocfile) {
@@ -206,7 +206,7 @@ public class NeuroDroid extends Activity
                     String bmfile = CACHEDIR + "/" + fHoc;
                     saveAssetsFile(fHoc, bmfile);
                     String[] cmdlist = {NRNBIN, bmfile};
-                    nrnoutput = runBinary(cmdlist);
+                    nrnoutput = runBinary(cmdlist, false, true);
                     runOnUiThread(new Runnable(){
                             @Override
                                 public void run() {
@@ -229,14 +229,14 @@ public class NeuroDroid extends Activity
         boolean vfp = false;
         try {
             Log.v(TAG, "Parsing /proc/cpuinfo for vfp support");
-            while (scanner.hasNextLine()){
+            while (scanner.hasNextLine()) {
                 if (!vfp && (scanner.findInLine("vfpv3")!=null)) {
                     vfp = true;
                 }
                 Log.v(TAG, scanner.nextLine());
             }
         }
-        finally{
+        finally {
             scanner.close();
         }
         
@@ -261,7 +261,6 @@ public class NeuroDroid extends Activity
     public void saveAssetsFile(String src, String target) {
 
         String newfn;
-        
         try {
             InputStream is = getAssets().open(src);
 
@@ -278,7 +277,7 @@ public class NeuroDroid extends Activity
             is.close();
             
         } catch (IOException e) {
-            // Should never happen!
+            Log.e(TAG, "Couldn't find assets file; exiting now");
             throw new RuntimeException(e);
         }
         
@@ -295,7 +294,7 @@ public class NeuroDroid extends Activity
     /* Run a binary using binDir as the wd. Return stdout
      * and optinally stderr
      */
-    public String runBinary(String[] binName, boolean stderr, boolean interactive) {
+    public String runBinary(String[] binName, boolean stderr, boolean parse) {
         try {
             File binDir = new File(BINDIR);
             if (!binDir.exists()) {
@@ -303,7 +302,6 @@ public class NeuroDroid extends Activity
             }
 
             List binNameList = Arrays.asList(binName);
-            /* Process process = Runtime.getRuntime().exec(binName, envp, binDir);*/
             ProcessBuilder pb = new ProcessBuilder(binNameList).directory(binDir);
             Map<String, String> env = pb.environment();
             env.put("NEURONHOME", NRNHOME);
@@ -312,27 +310,45 @@ public class NeuroDroid extends Activity
             // Waits for the command to finish.
             process.waitFor();
 
-            BufferedReader outreader = new BufferedReader(
-                                                          new InputStreamReader(process.getInputStream()));
-            BufferedReader errreader = new BufferedReader(
-                                                          new InputStreamReader(process.getErrorStream()));
 
-            int read;
-            char[] buffer = new char[32768];
-            StringBuffer output = new StringBuffer();
-            while ((read = outreader.read(buffer)) > 0) {
-                output.append(buffer, 0, read);
+            Scanner outscanner = new Scanner(process.getInputStream());
+            Scanner errscanner = new Scanner(process.getErrorStream());
+            String NL = System.getProperty("line.separator");
+            
+            String output = "";
+            
+            try {
+                while (outscanner.hasNextLine()) {
+                    if (parse) {
+                        if (outscanner.findInLine("ND") != null) {
+                            outscanner.nextLine();
+                        } else {
+                            output += outscanner.nextLine();
+                            output += NL;
+                        }
+                    } else {
+                        output += outscanner.nextLine();
+                        output += NL;
+                    }
+                }
+            }
+            finally {
+                outscanner.close();
             }
             if (stderr) {
-                while ((read = errreader.read(buffer)) > 0) {
-                    output.append(buffer, 0, read);
+                output += NL + "stderr:" + NL;
+                try {
+                    while (errscanner.hasNextLine()) {
+                        output += errscanner.nextLine() + NL;
+                    }
+                }
+                finally {
+                    errscanner.close();
                 }
             }
 
-            outreader.close();
-            errreader.close();
+            return output;
 
-            return output.toString();
         } catch (IOException e) {
             throw new RuntimeException(e);
         } catch (InterruptedException e) {
@@ -373,26 +389,43 @@ public class NeuroDroid extends Activity
     public synchronized void onActivityResult(final int requestCode,
                                               int resultCode, final Intent data) {
 
-        if (resultCode == Activity.RESULT_OK) {
-
-            if (requestCode == REQUEST_SAVE) {
-                System.out.println("Saving...");
-            } else if (requestCode == REQUEST_LOAD) {
-                System.out.println("Loading...");
-            }
-
-            curHocFile = data.getStringExtra(FileDialog.RESULT_PATH);
-            Log.v(TAG, curHocFile);
-
-            String[] nrncmd = {NRNBIN, curHocFile};
-            nrnoutput = runBinary(nrncmd);
-
-            tv.setText(nrnversion + "\n" + nrnoutput);
-
-        } else if (resultCode == Activity.RESULT_CANCELED) {
-            Log.v(TAG, "file not selected");
+        switch (requestCode) {
+         case REQUEST_SAVE:
+         case REQUEST_LOAD:
+             /* file dialog */
+             if (resultCode == Activity.RESULT_OK) {
+                     
+                 if (requestCode == REQUEST_SAVE) {
+                     System.out.println("Saving...");
+                 } else if (requestCode == REQUEST_LOAD) {
+                     System.out.println("Loading...");
+                 }
+                     
+                 curHocFile = data.getStringExtra(FileDialog.RESULT_PATH);
+                 Log.v(TAG, curHocFile);
+                     
+                 String[] nrncmd = {NRNBIN, curHocFile};
+                 nrnoutput = runBinary(nrncmd);
+                     
+                 tv.setText(nrnversion + "\n" + nrnoutput);
+                     
+             } else if (resultCode == Activity.RESULT_CANCELED) {
+                 Log.v(TAG, "file not selected");
+             }
+             break;
+         case REQUEST_PREFS:
+             SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+             boolean useVfp = prefs.getBoolean("checkbox_vfp", true);
+             cpNrnBin(useVfp);
+             if (useVfp) {
+                 Log.v(TAG, "Vfp enabled through options");
+             } else {
+                 Log.v(TAG, "Vfp disabled through options");
+             }
+             break;
+         default:
+             Log.e(TAG, "Unknown request code");
         }
-
     }
     
     /* Copy nrniv to binDir and make executable */

@@ -53,14 +53,6 @@
 
   </LinearLayout>
 
-  <CheckBox 
-      android:layout_width="wrap_content" 
-      android:layout_height="wrap_content" 
-      android:id="@+id/chkEnableVfp" 
-      android:text="Enable vfp support" 
-      android:checked="true">
-  </CheckBox>
-
   <TextView
       android:id="@+id/txtOutput" 
       android:layout_height="wrap_content" 

@@ -7,15 +7,22 @@
 package org.neurodroid;
 
 import java.io.IOException;
+
 import android.app.Activity;
+
 import android.content.SharedPreferences;
+
 import android.os.Bundle;
+
 import android.view.View;
 import android.view.View.OnClickListener;
+
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
+import android.preference.PreferenceManager;
 import android.preference.CheckBoxPreference;
 import android.preference.Preference.OnPreferenceClickListener;
+
 import android.widget.Toast;
 
 public class Preferences extends PreferenceActivity {
@@ -36,11 +43,15 @@ public class Preferences extends PreferenceActivity {
             supportsVfp = false;
         }
 
-        /* Enable vfp extension */
+        /* Get previous vfp state */
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        boolean prevVfp = prefs.getBoolean("checkbox_vfp", true);
+        
+        /* Initialise vfp status */
         chkEnableVfp = (CheckBoxPreference)getPreferenceScreen().findPreference("checkbox_vfp");
         if (supportsVfp) {
             chkEnableVfp.setEnabled(true);
-            chkEnableVfp.setChecked(true);
+            chkEnableVfp.setChecked(prevVfp);
         } else {
             chkEnableVfp.setEnabled(false);
             chkEnableVfp.setChecked(false);

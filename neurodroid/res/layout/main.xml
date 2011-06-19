@@ -4,7 +4,7 @@
     android:orientation="vertical"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
-    android:stretchColumns="2">
+    android:stretchColumns="3">
 
   <TableRow>
     <Button
@@ -22,6 +22,7 @@
         android:layout_height="wrap_content" 
         android:typeface="normal">
     </Button>
+
   </TableRow>
 
   <TableRow>
@@ -36,6 +37,16 @@
     <Button
         android:id="@+id/btnSquid" 
         android:text="Squid AP simulation" 
+        android:layout_width="fill_parent" 
+        android:layout_height="wrap_content" 
+        android:typeface="normal">
+    </Button>
+  </TableRow>
+
+  <TableRow>
+    <Button
+        android:id="@+id/btnTerm" 
+        android:text="Start terminal session" 
         android:layout_width="fill_parent" 
         android:layout_height="wrap_content" 
         android:typeface="normal">

@@ -40,6 +40,8 @@ import android.content.Intent;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.content.Context;
+import android.content.ComponentName;
+import android.content.ActivityNotFoundException;
 
 import android.preference.PreferenceManager;
 
@@ -120,6 +122,20 @@ public class NeuroDroid extends Activity
                     String[] cmdlist = {NRNBIN, "-c", stdcmd};
                     nrnoutput = runBinary(cmdlist);
                     tv.setText(nrnversion + "\n" + nrnoutput);
+                }});
+
+        /* Test std library */
+        Button buttonTerm = (Button)findViewById(R.id.btnTerm);
+        buttonTerm.setOnClickListener(new OnClickListener() {
+                public void onClick(View v) {
+                    Intent intent = new Intent(Intent.ACTION_MAIN);
+                    intent.setComponent(new ComponentName("jackpal.androidterm", "jackpal.androidterm.Term"));
+                    try {
+                        startActivity(intent);
+                    } catch (ActivityNotFoundException e) {
+                        tv.setText(nrnversion + "\n" +
+                                   "Couldn't find Android Terminal Emulator. You can get it from the Market.");
+                    }
                 }});
 
         /* Benchmark */

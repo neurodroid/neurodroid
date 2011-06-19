@@ -6,21 +6,54 @@
 
 package org.neurodroid;
 
+import java.io.*;
+import java.util.Scanner;
+import java.util.ArrayList;
+import java.util.concurrent.CountDownLatch;
+
 import android.app.Activity;
+import android.app.ProgressDialog;
 
 import android.widget.Button;
+
 import android.os.Bundle;
+
 import android.view.View;
 import android.view.View.OnClickListener;
 
+import android.content.Intent;
+
+import android.util.Log;
+
 public class Squid extends Activity {
 
+    public GraphView gv;
+
+    private String NRNBIN, BINDIR, NRNHOME, CACHEDIR;
+    private String fHoc;
+    private ProgressDialog pd;
+    private String nrnoutput;
+    
     /** Called when the activity is first created. */
     @Override public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setResult(RESULT_OK, getIntent());
 
         setContentView(R.layout.squid);
+
+        Intent intent = getIntent();
+        NRNBIN = NeuroDroid.NRNBIN;
+        BINDIR = NeuroDroid.BINDIR;
+        NRNHOME = NeuroDroid.NRNHOME;
+        CACHEDIR = NeuroDroid.CACHEDIR;
+        
+        gv = (GraphView)findViewById(R.id.vwGraphView);
+
+        Button runButton = (Button)findViewById(R.id.btnSquidRun);
+        runButton.setOnClickListener(new OnClickListener() {
+                @Override public void onClick(View v) {
+                    runHoc("Running squid AP simulation...", "squid.hoc");
+                }
+            });
 
         Button backButton = (Button)findViewById(R.id.btnSquidBack);
         backButton.setOnClickListener(new OnClickListener() {
@@ -28,5 +61,31 @@ public class Squid extends Activity {
                     finish();
                 }
             });
+
+    }
+
+    public String runHoc(String msg, String hocfile) {
+        pd = ProgressDialog.show(this,
+                                 "Please wait...", msg, true);
+        fHoc = hocfile;
+        new Thread(new Runnable(){
+                public void run(){
+                    String bmfile = CACHEDIR + "/" + fHoc;
+                    String[] cmdlist = {NRNBIN, bmfile};
+                    final String squidOut = NeuroDroid.runBinary(cmdlist, false);
+                    runOnUiThread(new Runnable(){
+                            @Override public void run() {
+                                if (pd.isShowing()) {
+                                    pd.dismiss();
+                                }
+                                ArrayList<Float> values = NeuroDroid.parseNrnOut(squidOut);
+                                gv.setGraph(values, "Squid AP");
+                                gv.invalidate();
+                            }
+                        });
+                }
+            }).start();
+            
+        return nrnoutput;
     }
 }

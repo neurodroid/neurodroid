@@ -2,15 +2,36 @@
 <LinearLayout 
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content">
+
+  <LinearLayout 
+      xmlns:android="http://schemas.android.com/apk/res/android"
+      android:orientation="horizontal"
+      android:layout_width="fill_parent"
+      android:layout_height="wrap_content">
+
+    <Button
+        android:id="@+id/btnSquidRun" 
+        android:text="Run" 
+        android:layout_width="wrap_content" 
+        android:layout_height="wrap_content" 
+        android:typeface="normal">
+    </Button>
 
     <Button
         android:id="@+id/btnSquidBack" 
         android:text="Back" 
-        android:layout_height="wrap_content" 
         android:layout_width="wrap_content" 
+        android:layout_height="wrap_content" 
         android:typeface="normal">
     </Button>
+  </LinearLayout>
+
+  <org.neurodroid.GraphView
+      android:id="@+id/vwGraphView" 
+      android:layout_width="fill_parent" 
+      android:layout_height="wrap_content" 
+      android:typeface="normal" />
 
 </LinearLayout>

@@ -17,4 +17,5 @@ ic = new IClamp(0)
 ic.dur = 0.5 /* ms */
 ic.amp = 50  /* nA */
 
+print "ND dt ", dt 
 run()

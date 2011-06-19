@@ -1,63 +1,53 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout 
+<TableLayout 
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:stretchColumns="2">
 
-  <LinearLayout
-      xmlns:android="http://schemas.android.com/apk/res/android"
-      android:orientation="horizontal"
-      android:layout_width="match_parent"
-      android:layout_height="wrap_content">
-
+  <TableRow>
     <Button
         android:id="@+id/btnLoadFile" 
         android:text="Load hoc file" 
+        android:layout_width="fill_parent" 
         android:layout_height="wrap_content" 
-        android:layout_width="wrap_content" 
         android:typeface="normal">
     </Button>
 
     <Button
         android:id="@+id/btnTestStd" 
         android:text="Test standard library" 
+        android:layout_width="fill_parent" 
         android:layout_height="wrap_content" 
-        android:layout_width="wrap_content" 
         android:typeface="normal">
     </Button>
+  </TableRow>
 
-  </LinearLayout>
-
-  <LinearLayout
-      xmlns:android="http://schemas.android.com/apk/res/android"
-      android:orientation="horizontal"
-      android:layout_width="match_parent"
-      android:layout_height="wrap_content">
-
+  <TableRow>
     <Button
         android:id="@+id/btnBenchmark" 
         android:text="Run benchmark" 
+        android:layout_width="fill_parent" 
         android:layout_height="wrap_content" 
-        android:layout_width="wrap_content" 
         android:typeface="normal">
     </Button>
 
     <Button
         android:id="@+id/btnSquid" 
         android:text="Squid AP simulation" 
+        android:layout_width="fill_parent" 
         android:layout_height="wrap_content" 
-        android:layout_width="wrap_content" 
         android:typeface="normal">
     </Button>
+  </TableRow>
 
-  </LinearLayout>
-
+  <!-- Will span all columns -->
   <TextView
       android:id="@+id/txtOutput" 
+      android:layout_width="fill_parent" 
       android:layout_height="wrap_content" 
-      android:layout_width="match_parent" 
       android:typeface="normal">
   </TextView>
 
-</LinearLayout>
+</TableLayout>

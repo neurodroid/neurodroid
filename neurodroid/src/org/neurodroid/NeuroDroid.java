@@ -7,12 +7,13 @@
 package org.neurodroid;
 
 import java.io.*;
+
 import java.util.Enumeration;
 import java.util.Scanner;
 import java.util.Map;
 import java.util.List;
 import java.util.Arrays;
-import java.util.concurrent.CountDownLatch;
+import java.util.ArrayList;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
@@ -46,17 +47,17 @@ public class NeuroDroid extends Activity
 {
 
     public String fHoc;
-    public ProgressDialog pd2;
+    public static final String TAG = "neurodroid";
+    public static final String CACHEDIR = "/data/data/org.neurodroid/cache";
+    public static final String BINDIR = "/data/data/org.neurodroid";
+    public static final String NRNBIN = BINDIR + "/nrniv";
+    public static final String NRNHOME = BINDIR + "/nrnhome";
     
     private boolean supportsVfp;
     private CheckBox chkEnableVfp;
     
     private String nrnoutput="", nrnversion, curHocFile;
-    private static final String CACHEDIR = "/data/data/org.neurodroid/cache";
-    private static final String BINDIR = "/data/data/org.neurodroid";
-    private static final String NRNBIN = BINDIR + "/nrniv";
-    private static final String NRNHOME = BINDIR + "/nrnhome";
-    private static final String TAG = "neurodroid";
+    private static final String[] HOC_ASSETS = {"benchmark.hoc", "squid.hoc"};
     private static final int REQUEST_SAVE=0, REQUEST_LOAD=1, REQUEST_PREFS=2,
         REQUEST_SQUID_BACK=3;
     private ProgressDialog pd;
@@ -139,21 +140,29 @@ public class NeuroDroid extends Activity
 
         /* Check whether we need to install the std lib */
         if (!(new File(NRNHOME + "/lib/hoc/stdlib.hoc")).exists()) {
-            pd2 =  ProgressDialog.show(this,
+            pd =  ProgressDialog.show(this,
                                        "Please wait...", "Installing standard library...", true);
             new Thread(new Runnable(){
                     public void run(){
                         installStdLib();
                         runOnUiThread(new Runnable(){
                                 @Override public void run() {
-                                    if(pd2.isShowing())
-                                        pd2.dismiss();
+                                    if (pd.isShowing())
+                                        pd.dismiss();
                                 }
                             });
                     }
                 }).start();
         }
         tv.setText(nrnversion);
+        
+        /* Check whether we need to install hoc files */
+        for (int i=0; i<HOC_ASSETS.length; i++) {
+            String bmfile = CACHEDIR + "/" + HOC_ASSETS[i];
+            if (!(new File(bmfile)).exists()) {
+                saveAssetsFile(HOC_ASSETS[i], bmfile);
+            }
+        }
     }
 
     /** Creates an options menu */
@@ -182,28 +191,27 @@ public class NeuroDroid extends Activity
     }
     
     public void runSquid(View v) {
-        runHoc("Running squid AP simulation...", "squid.hoc");
         Intent squidActivity = new Intent(getBaseContext(),
                                           Squid.class);
+        squidActivity.putExtra("org.neurodroid.NeuroDroid.NRNBIN", NRNBIN);
         startActivity(squidActivity);
     }
 
     public void runHoc(String msg, String hocfile) {
         tv.setText(nrnversion + "\n" + msg);
         tv.invalidate();
-        pd2 = ProgressDialog.show(this,
+        pd = ProgressDialog.show(this,
                                   "Please wait...", msg, true);
         fHoc = hocfile;
         new Thread(new Runnable(){
                 public void run(){
                     String bmfile = CACHEDIR + "/" + fHoc;
-                    saveAssetsFile(fHoc, bmfile);
                     String[] cmdlist = {NRNBIN, bmfile};
-                    nrnoutput = runBinary(cmdlist, false, true);
+                    nrnoutput = runBinary(cmdlist, false);
                     runOnUiThread(new Runnable(){
                             @Override public void run() {
-                                if(pd2.isShowing())
-                                    pd2.dismiss();
+                                if (pd.isShowing())
+                                    pd.dismiss();
                                 tv.setText(nrnversion + "\n" + nrnoutput);
                             }
                         });
@@ -275,18 +283,14 @@ public class NeuroDroid extends Activity
         
     }
 
-    public String runBinary(String[] binName) {
-        return runBinary(binName, false, false);
-    }
-
-    public String runBinary(String[] binName, boolean stderr) {
-        return runBinary(binName, stderr, false);
+    public static String runBinary(String[] binName) {
+        return runBinary(binName, false);
     }
 
     /* Run a binary using binDir as the wd. Return stdout
      * and optinally stderr
      */
-    public String runBinary(String[] binName, boolean stderr, boolean parse) {
+    public static String runBinary(String[] binName, boolean stderr) {
         try {
             File binDir = new File(BINDIR);
             if (!binDir.exists()) {
@@ -311,17 +315,8 @@ public class NeuroDroid extends Activity
             
             try {
                 while (outscanner.hasNextLine()) {
-                    if (parse) {
-                        if (outscanner.findInLine("ND") != null) {
-                            outscanner.nextLine();
-                        } else {
-                            output += outscanner.nextLine();
-                            output += NL;
-                        }
-                    } else {
-                        output += outscanner.nextLine();
-                        output += NL;
-                    }
+                    output += outscanner.nextLine();
+                    output += NL;
                 }
             }
             finally {
@@ -348,6 +343,31 @@ public class NeuroDroid extends Activity
         }
     }
 
+    public static ArrayList<Float> parseNrnOut(String nrnOut) {
+        Scanner outscanner = new Scanner(nrnOut);
+        ArrayList<Float> flArray = new ArrayList<Float>();
+        flArray.add(1.0f); /* dt */
+        try {
+            while (outscanner.hasNextLine()) {
+                if (outscanner.findInLine("ND") != null) {
+                    if (outscanner.findInLine("dt") != null) {
+                        if (outscanner.hasNextFloat()) {
+                            flArray.set(0, outscanner.nextFloat());
+                        }
+                    }
+                    if (outscanner.hasNextFloat()) {
+                        flArray.add(outscanner.nextFloat());
+                    }
+                }
+                outscanner.nextLine();
+            }
+        }
+        finally {
+            outscanner.close();
+        }
+        return flArray;
+    }
+    
     /* Install NEURON std lib that is included as a zip
      * file in the assets
      */
@@ -437,7 +457,7 @@ public class NeuroDroid extends Activity
         String[] chmodlist = {getChmod(), "744", NRNBIN};
         String chmodout = runBinary(chmodlist);
     }
-    
+
     /* Load libraries for native part of the app.
      */
     static {

@@ -397,10 +397,26 @@ public class NeuroDroid extends Activity
 
         u.unZip(newfn, NRNHOME);
 
+        /* Make readable */
+        String[] chmodlist1 = {getChmod(), "+r", BINDIR};
+        runBinary(chmodlist1);
+
+        String[] chmodlist2 = {getChmod(), "+x", NRNHOME};
+        runBinary(chmodlist2);
+
+        String[] chmodlist3 = {getChmod(), "-R", "+r", NRNHOME};
+        runBinary(chmodlist3);
+
+        String[] chmodlist4 = {getChmod(), "+x", NRNHOME + "/lib"};
+        runBinary(chmodlist4);
+
+        String[] chmodlist5 = {getChmod(), "+x", NRNHOME + "/lib/hoc"};
+        runBinary(chmodlist5);
+
         /* Make cleanup executable */
         String cleanup = NRNHOME + "/lib/cleanup";
-        String[] chmodlist = {getChmod(), "755", cleanup};
-        String chmodout = runBinary(chmodlist);
+        String[] chmodlist6 = {getChmod(), "755", cleanup};
+        runBinary(chmodlist6);
     }
 
     public static String getChmod() {

@@ -38,14 +38,13 @@ public class Squid extends Activity {
     @Override public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.squid);
-
-        Intent intent = getIntent();
         NRNBIN = NeuroDroid.NRNBIN;
         BINDIR = NeuroDroid.BINDIR;
         NRNHOME = NeuroDroid.NRNHOME;
         CACHEDIR = NeuroDroid.CACHEDIR;
         
+        setContentView(R.layout.squid);
+
         gv = (GraphView)findViewById(R.id.vwGraphView);
 
         Button runButton = (Button)findViewById(R.id.btnSquidRun);
@@ -79,7 +78,7 @@ public class Squid extends Activity {
                                     pd.dismiss();
                                 }
                                 ArrayList<Float> values = NeuroDroid.parseNrnOut(squidOut);
-                                gv.setGraph(values, "Squid AP");
+                                gv.setGraph(values, "Squid Action Potential");
                                 gv.invalidate();
                             }
                         });

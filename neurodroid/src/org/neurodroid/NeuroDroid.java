@@ -124,20 +124,6 @@ public class NeuroDroid extends Activity
                     tv.setText(nrnversion + "\n" + nrnoutput);
                 }});
 
-        /* Test std library */
-        Button buttonTerm = (Button)findViewById(R.id.btnTerm);
-        buttonTerm.setOnClickListener(new OnClickListener() {
-                public void onClick(View v) {
-                    Intent intent = new Intent(Intent.ACTION_MAIN);
-                    intent.setComponent(new ComponentName("jackpal.androidterm", "jackpal.androidterm.Term"));
-                    try {
-                        startActivity(intent);
-                    } catch (ActivityNotFoundException e) {
-                        tv.setText(nrnversion + "\n" +
-                                   "Couldn't find Android Terminal Emulator. You can get it from the Market.");
-                    }
-                }});
-
         /* Benchmark */
         Button buttonBenchmark = (Button)findViewById(R.id.btnBenchmark);
         buttonBenchmark.setOnClickListener(new OnClickListener() {
@@ -153,6 +139,22 @@ public class NeuroDroid extends Activity
                     runSquid(v);
                 }
             });
+
+        /* Run neuron in terminal */
+        Button buttonTerm = (Button)findViewById(R.id.btnTerm);
+        buttonTerm.setOnClickListener(new OnClickListener() {
+                public void onClick(View v) {
+                    Intent intent = new Intent(Intent.ACTION_MAIN);
+                    intent.setComponent(new ComponentName("jackpal.androidterm", "jackpal.androidterm.Term"));
+                    String initCmd = "cd /data/data/org.neurodroid/ && NEURONHOME=" + NRNHOME + " ./nrniv";
+                    intent.putExtra("jackpal.androidterm.iInitialCommand", initCmd);
+                    try {
+                        startActivity(intent);
+                    } catch (ActivityNotFoundException e) {
+                        tv.setText(nrnversion + "\n" +
+                                   "Couldn't find Android Terminal Emulator. You can get it from the Market.");
+                    }
+                }});
 
         /* Check whether we need to install the std lib */
         if (!(new File(NRNHOME + "/lib/hoc/stdlib.hoc")).exists()) {
@@ -209,7 +211,6 @@ public class NeuroDroid extends Activity
     public void runSquid(View v) {
         Intent squidActivity = new Intent(getBaseContext(),
                                           Squid.class);
-        squidActivity.putExtra("org.neurodroid.NeuroDroid.NRNBIN", NRNBIN);
         startActivity(squidActivity);
     }
 
@@ -398,7 +399,7 @@ public class NeuroDroid extends Activity
 
         /* Make cleanup executable */
         String cleanup = NRNHOME + "/lib/cleanup";
-        String[] chmodlist = {getChmod(), "744", cleanup};
+        String[] chmodlist = {getChmod(), "755", cleanup};
         String chmodout = runBinary(chmodlist);
     }
 
@@ -457,9 +458,10 @@ public class NeuroDroid extends Activity
              Log.e(TAG, "Unknown request code");
         }
     }
-    
+
     /* Copy nrniv to binDir and make executable */
     public void cpNrnBin(boolean withVfp) {
+        
         File binDir = new File(BINDIR);
         if (!binDir.exists()) {
             throw new RuntimeException("Couldn't find binary directory");
@@ -470,7 +472,7 @@ public class NeuroDroid extends Activity
             saveAssetsFile("armeabi/nrniv", NRNBIN);
         }
 
-        String[] chmodlist = {getChmod(), "744", NRNBIN};
+        String[] chmodlist = {getChmod(), "755", NRNBIN};
         String chmodout = runBinary(chmodlist);
     }
 

@@ -22,7 +22,6 @@ import android.widget.TextView;
 import android.widget.Button;
 import android.widget.Toast;
 import android.widget.CheckBox;
-import android.widget.PopupWindow;
 
 import android.os.Bundle;
 
@@ -31,12 +30,15 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MenuInflater;
 import android.view.View.OnClickListener;
+import android.view.Gravity;
+import android.view.LayoutInflater;
 
 import android.util.Log;
 
 import android.content.Intent;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
+import android.content.Context;
 
 import android.preference.PreferenceManager;
 
@@ -55,14 +57,13 @@ public class NeuroDroid extends Activity
     private static final String NRNBIN = BINDIR + "/nrniv";
     private static final String NRNHOME = BINDIR + "/nrnhome";
     private static final String TAG = "neurodroid";
-    private static final int REQUEST_SAVE=0, REQUEST_LOAD=1, REQUEST_PREFS=2;
+    private static final int REQUEST_SAVE=0, REQUEST_LOAD=1, REQUEST_PREFS=2,
+        REQUEST_SQUID_BACK=3;
     private ProgressDialog pd;
     private TextView tv;
     
     /** Called when the activity is first created. */
-    @Override
-    public void onCreate(Bundle savedInstanceState)
-    {
+    @Override public void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
@@ -144,8 +145,7 @@ public class NeuroDroid extends Activity
                     public void run(){
                         installStdLib();
                         runOnUiThread(new Runnable(){
-                                @Override
-                                    public void run() {
+                                @Override public void run() {
                                     if(pd2.isShowing())
                                         pd2.dismiss();
                                 }
@@ -157,16 +157,14 @@ public class NeuroDroid extends Activity
     }
 
     /** Creates an options menu */
-    @Override
-        public boolean onCreateOptionsMenu(Menu menu) {
+    @Override public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu, menu);
         return true;
     }
 
     /** Opens the options menu */
-    @Override
-        public boolean onOptionsItemSelected(MenuItem item) {
+    @Override public boolean onOptionsItemSelected(MenuItem item) {
         // Handle item selection
         switch (item.getItemId()) {
          case R.id.preferences:
@@ -185,14 +183,9 @@ public class NeuroDroid extends Activity
     
     public void runSquid(View v) {
         runHoc("Running squid AP simulation...", "squid.hoc");
-        /*
-        float[] values = new float[] { 2.0f,1.5f, 2.5f, 1.0f , 3.0f };
-        String[] verlabels = new String[] { "great", "ok", "bad" };
-        String[] horlabels = new String[] { "today", "tomorrow", "next week", "next month" };
-        
-        GraphView gv = new GraphView(this, values, "GraphViewDemo",horlabels, verlabels, GraphView.BAR);
-        PopupWindow pw = new PopupWindow(gv);
-          pw.show(v);*/
+        Intent squidActivity = new Intent(getBaseContext(),
+                                          Squid.class);
+        startActivity(squidActivity);
     }
 
     public void runHoc(String msg, String hocfile) {
@@ -208,8 +201,7 @@ public class NeuroDroid extends Activity
                     String[] cmdlist = {NRNBIN, bmfile};
                     nrnoutput = runBinary(cmdlist, false, true);
                     runOnUiThread(new Runnable(){
-                            @Override
-                                public void run() {
+                            @Override public void run() {
                                 if(pd2.isShowing())
                                     pd2.dismiss();
                                 tv.setText(nrnversion + "\n" + nrnoutput);
@@ -422,6 +414,8 @@ public class NeuroDroid extends Activity
              } else {
                  Log.v(TAG, "Vfp disabled through options");
              }
+             break;
+         case REQUEST_SQUID_BACK:
              break;
          default:
              Log.e(TAG, "Unknown request code");

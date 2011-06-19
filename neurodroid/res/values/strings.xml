@@ -3,6 +3,7 @@
     <string name="app_name">neurodroid</string>
     <string name="fb_name">File Browser</string>
     <string name="pref_name">Neurodroid preferences</string>
+    <string name="squid_name">Squid AP</string>
     <string name="location">Location</string>
     <string name="cant_read_folder">folder can\'t be read!</string>
     <string name="nnew">New</string>

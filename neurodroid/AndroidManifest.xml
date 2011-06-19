@@ -31,6 +31,12 @@
         android:launchMode="singleTop">
     </activity>
 
+    <activity 
+        android:name="Squid"
+        android:label="@string/squid_name"
+        android:launchMode="singleTop">
+    </activity>
+
   </application>
 
   <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"></uses-permission>

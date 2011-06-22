@@ -15,6 +15,8 @@
     <string name="preferences">Preferences</string>
     <string name="title_vfp_checkbox">vfp</string>
     <string name="summary_vfp_checkbox">Enable vfp support</string>
+    <string name="app_terminal_missing">Terminal missing</string>
+    <string name="app_terminal_get">Go to Market</string>
 
     <color name="gray">#ffff0000</color>
 </resources>

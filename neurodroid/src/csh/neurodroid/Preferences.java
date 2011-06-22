@@ -4,7 +4,7 @@
  * See the LICENSE file that accompanies this code.
  */
 
-package org.neurodroid;
+package csh.neurodroid;
 
 import java.io.IOException;
 

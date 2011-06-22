@@ -1,4 +1,4 @@
-package org.neurodroid;
+package csh.neurodroid;
 
 import java.io.*;
 import java.util.*;

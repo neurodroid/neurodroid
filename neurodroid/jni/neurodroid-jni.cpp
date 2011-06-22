@@ -22,10 +22,10 @@ extern "C" {
 /* See the corresponding Java source
  * file located at:
  *
- *   src/org/neurodroid/NeuroDroid.java
+ *   src/csh/neurodroid/NeuroDroid.java
  */
 jstring
-Java_org_neurodroid_NeuroDroidJNI_loadNrn( JNIEnv* env,
+Java_csh_neurodroid_NeuroDroidJNI_loadNrn( JNIEnv* env,
                                            jobject thiz,
                                            jstring input )
 {

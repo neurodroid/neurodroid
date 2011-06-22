@@ -4,7 +4,7 @@
  * See the LICENSE file that accompanies this code.
  */
 
-package org.neurodroid;
+package csh.neurodroid;
 
 import java.io.*;
 
@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.app.AlertDialog;
+import android.app.Dialog;
 
 import android.widget.TextView;
 import android.widget.Button;
@@ -45,13 +46,15 @@ import android.content.ActivityNotFoundException;
 
 import android.preference.PreferenceManager;
 
+import android.net.Uri;
+
 public class NeuroDroid extends Activity
 {
 
     public String fHoc;
     public static final String TAG = "neurodroid";
-    public static final String CACHEDIR = "/data/data/org.neurodroid/cache";
-    public static final String BINDIR = "/data/data/org.neurodroid";
+    public static final String CACHEDIR = "/data/data/csh.neurodroid/cache";
+    public static final String BINDIR = "/data/data/csh.neurodroid";
     public static final String NRNBIN = BINDIR + "/nrniv";
     public static final String NRNHOME = BINDIR + "/nrnhome";
     
@@ -62,6 +65,7 @@ public class NeuroDroid extends Activity
     private static final String[] HOC_ASSETS = {"benchmark.hoc", "squid.hoc"};
     private static final int REQUEST_SAVE=0, REQUEST_LOAD=1, REQUEST_PREFS=2,
         REQUEST_SQUID_BACK=3;
+    private static final int DIALOG_ANDROIDTERM=0;
     private ProgressDialog pd;
     private TextView tv;
     
@@ -146,11 +150,12 @@ public class NeuroDroid extends Activity
                 public void onClick(View v) {
                     Intent intent = new Intent(Intent.ACTION_MAIN);
                     intent.setComponent(new ComponentName("jackpal.androidterm", "jackpal.androidterm.Term"));
-                    String initCmd = "cd /data/data/org.neurodroid/ && NEURONHOME=" + NRNHOME + " ./nrniv";
+                    String initCmd = "cd /data/data/csh.neurodroid/ && NEURONHOME=" + NRNHOME + " ./nrniv";
                     intent.putExtra("jackpal.androidterm.iInitialCommand", initCmd);
                     try {
                         startActivity(intent);
                     } catch (ActivityNotFoundException e) {
+                        showDialog(DIALOG_ANDROIDTERM);
                         tv.setText(nrnversion + "\n" +
                                    "Couldn't find Android Terminal Emulator. You can get it from the Market.");
                     }
@@ -182,7 +187,31 @@ public class NeuroDroid extends Activity
             }
         }
     }
+    
+    @Override protected Dialog onCreateDialog(int id) {
+        switch (id) {
+         case DIALOG_ANDROIDTERM:
+             return new AlertDialog.Builder(NeuroDroid.this)
+                 .setIcon(R.drawable.app_terminal)
+                 .setTitle(R.string.app_terminal_missing)
+                 .setPositiveButton(R.string.app_terminal_get, new DialogInterface.OnClickListener() {
+                         public void onClick(DialogInterface dialog, int whichButton) {
+                             Intent intent = new Intent(Intent.ACTION_VIEW,
+                                                        Uri.parse("market://details?id=jackpal.androidterm"));
+                             startActivity(intent);
+                         }
+                     })
+                 .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                         public void onClick(DialogInterface dialog, int whichButton) {
 
+                             /* Return silently */
+                         }
+                     })
+                 .create();
+        }
+        return null;
+    }
+    
     /** Creates an options menu */
     @Override public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
@@ -203,6 +232,7 @@ public class NeuroDroid extends Activity
              return super.onOptionsItemSelected(item);
         }
     }
+
     
     public void runBenchmark(View v) {
         runHoc("Running benchmark...", "benchmark.hoc");

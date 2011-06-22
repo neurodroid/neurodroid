@@ -1,4 +1,4 @@
-package org.neurodroid;
+package csh.neurodroid;
 
 import android.test.ActivityInstrumentationTestCase;
 
@@ -9,13 +9,13 @@ import android.test.ActivityInstrumentationTestCase;
  * <p/>
  * To run this test, you can type:
  * adb shell am instrument -w \
- * -e class org.neurodroid.neurodroidTest \
- * org.neurodroid.tests/android.test.InstrumentationTestRunner
+ * -e class csh.neurodroid.neurodroidTest \
+ * csh.neurodroid.tests/android.test.InstrumentationTestRunner
  */
 public class neurodroidTest extends ActivityInstrumentationTestCase<neurodroid> {
 
     public neurodroidTest() {
-        super("org.neurodroid", neurodroid.class);
+        super("csh.neurodroid", neurodroid.class);
     }
 
 }

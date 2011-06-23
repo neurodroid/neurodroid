@@ -8,7 +8,7 @@ import os
 
 def cpfile(src, target):
     sys.stdout.write("Copying %s to %s\n" % (src, target))
-    shutil.copyfile(src, target)
+    shutil.copy(src, target)
 
 archs = ["armeabi", "armeabi-v7a"]
 
@@ -18,7 +18,16 @@ for arch in archs:
     except os.error:
         pass
 
-    cpfile("./%s/x86/bin/nrniv" % arch, "../neurodroid/assets/%s/nrniv" % arch)
+    # Split into 1M chunks for Android <= 2.2:
+    p = subprocess.Popen("/usr/bin/split -b 1m nrniv nrniv.split", 
+                         cwd="./%s/x86/bin" % arch, 
+                         shell=True)
+    p.wait()
+
+    splitfiles = glob.glob("./%s/x86/bin/nrniv.split*" % arch)
+    print splitfiles
+    for splitfile in splitfiles:
+        cpfile(splitfile, "../neurodroid/assets/%s/" % arch)
 
 cpfile("benchmark.hoc", "../neurodroid/assets/benchmark.hoc")
 cpfile("squid.hoc", "../neurodroid/assets/squid.hoc")

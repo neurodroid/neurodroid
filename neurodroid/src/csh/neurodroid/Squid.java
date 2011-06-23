@@ -40,9 +40,11 @@ public class Squid extends Activity {
 
         NRNBIN = NeuroDroid.NRNBIN;
         BINDIR = NeuroDroid.BINDIR;
-        NRNHOME = NeuroDroid.NRNHOME;
         CACHEDIR = NeuroDroid.CACHEDIR;
-        
+
+        Intent intent = getIntent();
+        NRNHOME = intent.getStringExtra("csh.neurodroid.NrnHome");
+
         setContentView(R.layout.squid);
 
         gv = (GraphView)findViewById(R.id.vwGraphView);
@@ -71,7 +73,7 @@ public class Squid extends Activity {
                 public void run(){
                     String bmfile = CACHEDIR + "/" + fHoc;
                     String[] cmdlist = {NRNBIN, bmfile};
-                    final String squidOut = NeuroDroid.runBinary(cmdlist, false);
+                    final String squidOut = NeuroDroid.runBinary(cmdlist, NRNHOME, false);
                     runOnUiThread(new Runnable(){
                             @Override public void run() {
                                 if (pd.isShowing()) {

@@ -10,13 +10,15 @@
     <string name="select">Select</string>
     <string name="file_name">File name:</string>
     <string name="cancel">Cancel</string>
+    <string name="ok">Ok</string>
     <string name="create">Create</string>
     <string name="no_data">No Data</string>
     <string name="preferences">Preferences</string>
     <string name="title_vfp_checkbox">vfp</string>
     <string name="summary_vfp_checkbox">Enable vfp support</string>
-    <string name="app_terminal_missing">Terminal missing</string>
-    <string name="app_terminal_get">Go to Market</string>
+    <string name="app_terminal_missing">Terminal emulator missing</string>
+    <string name="app_terminal_get">Get Terminal</string>
+    <string name="market_missing">Google Market wasn\'t found on your device</string>
 
     <color name="gray">#ffff0000</color>
 </resources>

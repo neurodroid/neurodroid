@@ -107,6 +107,9 @@ public class UnZip {
                  os.write(b, 0, n);
              is.close();
              os.close();
+             String[] chmodlist = {NeuroDroid.getChmod(), "644", zipName};
+             NeuroDroid.runBinary(chmodlist, "");
+
              break;
          case LIST:
              // Not extracting, just list

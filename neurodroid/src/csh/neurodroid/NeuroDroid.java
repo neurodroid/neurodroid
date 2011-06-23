@@ -26,6 +26,7 @@ import android.widget.Toast;
 import android.widget.CheckBox;
 
 import android.os.Bundle;
+import android.os.Environment;
 
 import android.view.View;
 import android.view.Menu;
@@ -65,7 +66,7 @@ public class NeuroDroid extends Activity
     private static final String[] HOC_ASSETS = {"benchmark.hoc", "squid.hoc"};
     private static final int REQUEST_SAVE=0, REQUEST_LOAD=1, REQUEST_PREFS=2,
         REQUEST_SQUID_BACK=3;
-    private static final int DIALOG_ANDROIDTERM=0;
+    private static final int DIALOG_ANDROIDTERM=0, DIALOG_MARKETNOTFOUND=1;
     private ProgressDialog pd;
     private TextView tv;
     
@@ -80,7 +81,7 @@ public class NeuroDroid extends Activity
         if (!cacheDir.exists()) {
             cacheDir.mkdirs();
         }
-
+        
         tv = (TextView)findViewById(R.id.txtOutput);
         
         /* Check whether the cpu supports vfp instructions */
@@ -103,7 +104,7 @@ public class NeuroDroid extends Activity
         
         /* Get version information from NEURON */
         String[] cmdlist = {NRNBIN, "-c", "print nrnversion()"};
-        nrnversion = runBinary(cmdlist);
+        nrnversion = runBinary(cmdlist, NRNHOME);
         Log.v(TAG, "Neuron version: " + nrnversion);
 
         /* Load hoc file using a simple file dialog */
@@ -124,7 +125,7 @@ public class NeuroDroid extends Activity
                         "print \"Successfully opened standard library\"" +
                         "else print \"Failed to open standard library\"";
                     String[] cmdlist = {NRNBIN, "-c", stdcmd};
-                    nrnoutput = runBinary(cmdlist);
+                    nrnoutput = runBinary(cmdlist, NRNHOME);
                     tv.setText(nrnversion + "\n" + nrnoutput);
                 }});
 
@@ -198,12 +199,26 @@ public class NeuroDroid extends Activity
                          public void onClick(DialogInterface dialog, int whichButton) {
                              Intent intent = new Intent(Intent.ACTION_VIEW,
                                                         Uri.parse("market://details?id=jackpal.androidterm"));
-                             startActivity(intent);
+                             try {
+                                 startActivity(intent);
+                             } catch (ActivityNotFoundException e) {
+                                 showDialog(DIALOG_MARKETNOTFOUND);
+                             }
                          }
                      })
                  .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
                          public void onClick(DialogInterface dialog, int whichButton) {
 
+                             /* Return silently */
+                         }
+                     })
+                 .create();
+         case DIALOG_MARKETNOTFOUND:
+             return new AlertDialog.Builder(NeuroDroid.this)
+                 .setIcon(android.R.drawable.ic_dialog_alert)
+                 .setTitle(R.string.market_missing)
+                 .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                         public void onClick(DialogInterface dialog, int whichButton) {
                              /* Return silently */
                          }
                      })
@@ -241,6 +256,7 @@ public class NeuroDroid extends Activity
     public void runSquid(View v) {
         Intent squidActivity = new Intent(getBaseContext(),
                                           Squid.class);
+        squidActivity.putExtra("csh.neurodroid.NrnHome", NRNHOME);
         startActivity(squidActivity);
     }
 
@@ -254,7 +270,7 @@ public class NeuroDroid extends Activity
                 public void run(){
                     String bmfile = CACHEDIR + "/" + fHoc;
                     String[] cmdlist = {NRNBIN, bmfile};
-                    nrnoutput = runBinary(cmdlist, false);
+                    nrnoutput = runBinary(cmdlist, NRNHOME, false);
                     runOnUiThread(new Runnable(){
                             @Override public void run() {
                                 if (pd.isShowing())
@@ -330,14 +346,14 @@ public class NeuroDroid extends Activity
         
     }
 
-    public static String runBinary(String[] binName) {
-        return runBinary(binName, false);
+    public static String runBinary(String[] binName, String nrnHome) {
+        return runBinary(binName, nrnHome, false);
     }
 
     /* Run a binary using binDir as the wd. Return stdout
      * and optinally stderr
      */
-    public static String runBinary(String[] binName, boolean stderr) {
+    public static String runBinary(String[] binName, String nrnHome, boolean stderr) {
         try {
             File binDir = new File(BINDIR);
             if (!binDir.exists()) {
@@ -347,7 +363,7 @@ public class NeuroDroid extends Activity
             List binNameList = Arrays.asList(binName);
             ProcessBuilder pb = new ProcessBuilder(binNameList).directory(binDir);
             Map<String, String> env = pb.environment();
-            env.put("NEURONHOME", NRNHOME);
+            env.put("NEURONHOME", nrnHome);
 
             Process process = pb.start();
             // Waits for the command to finish.
@@ -428,25 +444,22 @@ public class NeuroDroid extends Activity
         u.unZip(newfn, NRNHOME);
 
         /* Make readable */
-        String[] chmodlist1 = {getChmod(), "+r", BINDIR};
-        runBinary(chmodlist1);
+        String[] chmodlist1 = {getChmod(), "755", BINDIR};
+        runBinary(chmodlist1, NRNHOME);
 
-        String[] chmodlist2 = {getChmod(), "+x", NRNHOME};
-        runBinary(chmodlist2);
+        String[] chmodlist2 = {getChmod(), "755", NRNHOME};
+        runBinary(chmodlist2, NRNHOME);
 
-        String[] chmodlist3 = {getChmod(), "-R", "+r", NRNHOME};
-        runBinary(chmodlist3);
+        String[] chmodlist3 = {getChmod(), "755", NRNHOME + "/lib"};
+        runBinary(chmodlist3, NRNHOME);
 
-        String[] chmodlist4 = {getChmod(), "+x", NRNHOME + "/lib"};
-        runBinary(chmodlist4);
-
-        String[] chmodlist5 = {getChmod(), "+x", NRNHOME + "/lib/hoc"};
-        runBinary(chmodlist5);
+        String[] chmodlist4 = {getChmod(), "755", NRNHOME + "/lib/hoc"};
+        runBinary(chmodlist4, NRNHOME);
 
         /* Make cleanup executable */
         String cleanup = NRNHOME + "/lib/cleanup";
         String[] chmodlist6 = {getChmod(), "755", cleanup};
-        runBinary(chmodlist6);
+        runBinary(chmodlist6, NRNHOME);
     }
 
     public static String getChmod() {
@@ -480,7 +493,7 @@ public class NeuroDroid extends Activity
                  Log.v(TAG, curHocFile);
                      
                  String[] nrncmd = {NRNBIN, curHocFile};
-                 nrnoutput = runBinary(nrncmd);
+                 nrnoutput = runBinary(nrncmd, NRNHOME);
                      
                  tv.setText(nrnversion + "\n" + nrnoutput);
                      
@@ -519,7 +532,7 @@ public class NeuroDroid extends Activity
         }
 
         String[] chmodlist = {getChmod(), "755", NRNBIN};
-        String chmodout = runBinary(chmodlist);
+        String chmodout = runBinary(chmodlist, NRNHOME);
     }
 
     /* Load libraries for native part of the app.

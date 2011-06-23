@@ -114,6 +114,23 @@ public class NeuroDroid extends Activity
         nrnversion = runBinary(cmdlist, NRNHOME);
         Log.v(TAG, "Neuron version: " + nrnversion);
 
+        /* Run neuron in terminal */
+        Button buttonTerm = (Button)findViewById(R.id.btnTerm);
+        buttonTerm.setOnClickListener(new OnClickListener() {
+                public void onClick(View v) {
+                    Intent intent = new Intent(Intent.ACTION_MAIN);
+                    intent.setComponent(new ComponentName("jackpal.androidterm", "jackpal.androidterm.Term"));
+                    String initCmd = "cd /data/data/csh.neurodroid/ && NEURONHOME=" + NRNHOME + " ./nrniv";
+                    intent.putExtra("jackpal.androidterm.iInitialCommand", initCmd);
+                    try {
+                        startActivity(intent);
+                    } catch (ActivityNotFoundException e) {
+                        showDialog(DIALOG_ANDROIDTERM);
+                        tv.setText(nrnversion + "\n" +
+                                   "Couldn't find Android Terminal Emulator. You can get it from the Market.");
+                    }
+                }});
+
         /* Load hoc file using a simple file dialog */
         Button buttonLoadFile = (Button)findViewById(R.id.btnLoadFile);
         buttonLoadFile.setOnClickListener(new OnClickListener() {
@@ -151,23 +168,6 @@ public class NeuroDroid extends Activity
                     runSquid(v);
                 }
             });
-
-        /* Run neuron in terminal */
-        Button buttonTerm = (Button)findViewById(R.id.btnTerm);
-        buttonTerm.setOnClickListener(new OnClickListener() {
-                public void onClick(View v) {
-                    Intent intent = new Intent(Intent.ACTION_MAIN);
-                    intent.setComponent(new ComponentName("jackpal.androidterm", "jackpal.androidterm.Term"));
-                    String initCmd = "cd /data/data/csh.neurodroid/ && NEURONHOME=" + NRNHOME + " ./nrniv";
-                    intent.putExtra("jackpal.androidterm.iInitialCommand", initCmd);
-                    try {
-                        startActivity(intent);
-                    } catch (ActivityNotFoundException e) {
-                        showDialog(DIALOG_ANDROIDTERM);
-                        tv.setText(nrnversion + "\n" +
-                                   "Couldn't find Android Terminal Emulator. You can get it from the Market.");
-                    }
-                }});
 
         /* Check whether we need to install the std lib */
         if (!(new File(NRNHOME + "/lib/hoc/stdlib.hoc")).exists()) {

@@ -57,24 +57,27 @@ import android.net.Uri;
 public class NeuroDroid extends Activity
 {
 
-    public String fHoc;
     public static final String TAG = "neurodroid";
     public static final String CACHEDIR = "/data/data/csh.neurodroid/cache";
     public static final String BINDIR = "/data/data/csh.neurodroid";
     public static final String NRNBIN = BINDIR + "/nrniv";
     public static final String NRNHOME = BINDIR + "/nrnhome";
+
+    public String fHoc;
     
-    private boolean supportsVfp;
-    private CheckBox chkEnableVfp;
-    
-    private String nrnoutput="", nrnversion, curHocFile;
+    private static final boolean TERMPATCH = true;
     private static final String[] HOC_ASSETS = {"benchmark.hoc", "squid.hoc"};
     private static final int REQUEST_SAVE=0, REQUEST_LOAD=1, REQUEST_PREFS=2,
         REQUEST_SQUID_BACK=3;
     private static final int DIALOG_ANDROIDTERM=0, DIALOG_MARKETNOTFOUND=1,
         DIALOG_ANDROIDTERMPATCH=2;
+
     private ProgressDialog pd;
     private TextView tv;
+    private boolean supportsVfp;
+    private CheckBox chkEnableVfp;
+    
+    private String nrnoutput="", nrnversion, curHocFile;
 
     private Resources resources;
     
@@ -123,37 +126,36 @@ public class NeuroDroid extends Activity
                 public void onClick(View v) {
                     Intent intent = new Intent(Intent.ACTION_MAIN);
                     ComponentName termComp = new ComponentName("jackpal.androidterm", "jackpal.androidterm.Term");
-
+                    int dlgid = DIALOG_ANDROIDTERM;
                     /* For the time being, check whether this is a patched version of the terminal emulator */
+                    if (NeuroDroid.TERMPATCH) {
+                        dlgid = DIALOG_ANDROIDTERMPATCH;
+                    }
                     try {
+                        /* We can use patched or newer versions of the terminal */
                         PackageInfo pinfo = getBaseContext().getPackageManager().getPackageInfo(termComp.getPackageName(), 0);
                         String patchVersion = pinfo.versionName;
-                        if (patchVersion != "1.0.30csh") {
+                        Log.v(TAG, "Terminal Emulator version: " + patchVersion);
+                        int patchCode = pinfo.versionCode;
+                        /* Throw exception if it's unpatched and outdated */
+                        if ( !patchVersion.endsWith("csh") && patchCode < 32) {
                             throw new PackageManager.NameNotFoundException();
                         }
+                        
+                        /* Launch neuron in terminal emulator */
                         intent.setComponent(termComp);
                         String initCmd = "cd /data/data/csh.neurodroid/ && NEURONHOME=" + NRNHOME + " ./nrniv";
                         intent.putExtra("jackpal.androidterm.iInitialCommand", initCmd);
                         startActivity(intent);
                     } catch (PackageManager.NameNotFoundException e) {
-                        showDialog(DIALOG_ANDROIDTERMPATCH);
+                        showDialog(dlgid);
                         tv.setText(nrnversion + "\n" +
                                    "Couldn't find Android Terminal Emulator.");
                     } catch (ActivityNotFoundException e) {
-                        showDialog(DIALOG_ANDROIDTERMPATCH);
+                        showDialog(dlgid);
                         tv.setText(nrnversion + "\n" +
                                    "Couldn't find Android Terminal Emulator.");
                     }
-                    
-                    /* Disabled while the patched version is required
-                    try {
-                        startActivity(intent);
-                    } catch (ActivityNotFoundException e) {
-                        showDialog(DIALOG_ANDROIDTERM);
-                        tv.setText(nrnversion + "\n" +
-                                   "Couldn't find Android Terminal Emulator. You can get it from the Market.");
-                    }
-                    */
                 }});
 
         /* Load hoc file using a simple file dialog */

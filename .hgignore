@@ -89,6 +89,8 @@ neurodroid/libs
 neurodroid/libs/*
 neurodroid/obj
 neurodroid/obj/*
+neurodroid/tests/bin
+neurodroid/tests/bin/*
 
 .DS_Store
 .AppleDouble

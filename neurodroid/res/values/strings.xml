@@ -1,11 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">neurodroid</string>
-    <string name="fb_name">File Browser</string>
+
+    <!-- Options Menu -->
     <string name="pref_name">Neurodroid preferences</string>
-    <string name="squid_name">Squid Action Potential</string>
-    <string name="location">Location</string>
-    <string name="cant_read_folder">folder can\'t be read!</string>
+    <string name="preferences">Preferences</string>
+    <string name="title_vfp_checkbox">vfp</string>
+    <string name="summary_vfp_checkbox">Enable vfp support</string>
+
+    <!-- File Browser -->
+    <string name="fb_name">File Browser</string>
     <string name="nnew">New</string>
     <string name="select">Select</string>
     <string name="file_name">File name:</string>
@@ -13,12 +17,27 @@
     <string name="ok">Ok</string>
     <string name="create">Create</string>
     <string name="no_data">No Data</string>
-    <string name="preferences">Preferences</string>
-    <string name="title_vfp_checkbox">vfp</string>
-    <string name="summary_vfp_checkbox">Enable vfp support</string>
+    <string name="location">Location</string>
+    <string name="cant_read_folder">folder can\'t be read!</string>
+
+    <!-- Button labels -->
+    <string name="start_terminal">Start NEURON in terminal</string>
+    <string name="load_hoc">Load hoc file</string>
+    <string name="test_std">Test standard library</string>
+    <string name="run_benchmark">Run benchmark</string>
+    <string name="squid_ap_sim">Squid AP simulation</string>
+
+    <!-- Terminal emulator -->
     <string name="app_terminal_missing">Terminal emulator missing</string>
     <string name="app_terminal_get">Get Terminal</string>
+    <string name="app_terminal_patch_missing">Couldn\'t find patched terminal emulator</string>
+    <string name="app_terminal_patch_get">Get patched terminal</string>
     <string name="market_missing">Google Market wasn\'t found on your device</string>
 
+    <!-- Misc -->
+    <string name="squid_name">Squid Action Potential</string>
+    <string name="wait_msg">Please wait...</string>
+
+    <!-- Colours -->
     <color name="gray">#ffff0000</color>
 </resources>

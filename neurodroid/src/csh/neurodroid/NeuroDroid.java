@@ -47,6 +47,8 @@ import android.content.Context;
 import android.content.ComponentName;
 import android.content.ActivityNotFoundException;
 import android.content.res.Resources;
+import android.content.pm.PackageManager;
+import android.content.pm.PackageInfo;
 
 import android.preference.PreferenceManager;
 
@@ -69,7 +71,8 @@ public class NeuroDroid extends Activity
     private static final String[] HOC_ASSETS = {"benchmark.hoc", "squid.hoc"};
     private static final int REQUEST_SAVE=0, REQUEST_LOAD=1, REQUEST_PREFS=2,
         REQUEST_SQUID_BACK=3;
-    private static final int DIALOG_ANDROIDTERM=0, DIALOG_MARKETNOTFOUND=1;
+    private static final int DIALOG_ANDROIDTERM=0, DIALOG_MARKETNOTFOUND=1,
+        DIALOG_ANDROIDTERMPATCH=2;
     private ProgressDialog pd;
     private TextView tv;
 
@@ -119,9 +122,30 @@ public class NeuroDroid extends Activity
         buttonTerm.setOnClickListener(new OnClickListener() {
                 public void onClick(View v) {
                     Intent intent = new Intent(Intent.ACTION_MAIN);
-                    intent.setComponent(new ComponentName("jackpal.androidterm", "jackpal.androidterm.Term"));
-                    String initCmd = "cd /data/data/csh.neurodroid/ && NEURONHOME=" + NRNHOME + " ./nrniv";
-                    intent.putExtra("jackpal.androidterm.iInitialCommand", initCmd);
+                    ComponentName termComp = new ComponentName("jackpal.androidterm", "jackpal.androidterm.Term");
+
+                    /* For the time being, check whether this is a patched version of the terminal emulator */
+                    try {
+                        PackageInfo pinfo = getBaseContext().getPackageManager().getPackageInfo(termComp.getPackageName(), 0);
+                        String patchVersion = pinfo.versionName;
+                        if (patchVersion != "1.0.30csh") {
+                            throw new PackageManager.NameNotFoundException();
+                        }
+                        intent.setComponent(termComp);
+                        String initCmd = "cd /data/data/csh.neurodroid/ && NEURONHOME=" + NRNHOME + " ./nrniv";
+                        intent.putExtra("jackpal.androidterm.iInitialCommand", initCmd);
+                        startActivity(intent);
+                    } catch (PackageManager.NameNotFoundException e) {
+                        showDialog(DIALOG_ANDROIDTERMPATCH);
+                        tv.setText(nrnversion + "\n" +
+                                   "Couldn't find Android Terminal Emulator.");
+                    } catch (ActivityNotFoundException e) {
+                        showDialog(DIALOG_ANDROIDTERMPATCH);
+                        tv.setText(nrnversion + "\n" +
+                                   "Couldn't find Android Terminal Emulator.");
+                    }
+                    
+                    /* Disabled while the patched version is required
                     try {
                         startActivity(intent);
                     } catch (ActivityNotFoundException e) {
@@ -129,6 +153,7 @@ public class NeuroDroid extends Activity
                         tv.setText(nrnversion + "\n" +
                                    "Couldn't find Android Terminal Emulator. You can get it from the Market.");
                     }
+                    */
                 }});
 
         /* Load hoc file using a simple file dialog */
@@ -172,7 +197,7 @@ public class NeuroDroid extends Activity
         /* Check whether we need to install the std lib */
         if (!(new File(NRNHOME + "/lib/hoc/stdlib.hoc")).exists()) {
             pd =  ProgressDialog.show(this,
-                                       "Please wait...", "Installing standard library...", true);
+                                      this.getString(R.string.wait_msg), "Installing standard library...", true);
             new Thread(new Runnable(){
                     public void run(){
                         installStdLib();
@@ -211,6 +236,24 @@ public class NeuroDroid extends Activity
                              } catch (ActivityNotFoundException e) {
                                  showDialog(DIALOG_MARKETNOTFOUND);
                              }
+                         }
+                     })
+                 .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                         public void onClick(DialogInterface dialog, int whichButton) {
+
+                             /* Return silently */
+                         }
+                     })
+                 .create();
+         case DIALOG_ANDROIDTERMPATCH:
+             return new AlertDialog.Builder(NeuroDroid.this)
+                 .setIcon(R.drawable.app_terminal)
+                 .setTitle(R.string.app_terminal_patch_missing)
+                 .setPositiveButton(R.string.app_terminal_patch_get, new DialogInterface.OnClickListener() {
+                         public void onClick(DialogInterface dialog, int whichButton) {
+                             Intent intent = new Intent(Intent.ACTION_VIEW,
+                                                        Uri.parse("http://code.google.com/p/neurodroid/downloads/list"));
+                             startActivity(intent);
                          }
                      })
                  .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
@@ -271,7 +314,7 @@ public class NeuroDroid extends Activity
         tv.setText(nrnversion + "\n" + msg);
         tv.invalidate();
         pd = ProgressDialog.show(this,
-                                  "Please wait...", msg, true);
+                                 this.getString(R.string.wait_msg), msg, true);
         fHoc = hocfile;
         new Thread(new Runnable(){
                 public void run(){
@@ -368,7 +411,7 @@ public class NeuroDroid extends Activity
             }
             
             /* Can't set the environment on Android <= 2.2 with
-             * ProcessBuilder. Resorting back to old-school Process.exec.
+             * ProcessBuilder. Resorting back to old-school exec.
              */
             String[] envp = {"NEURONHOME="+nrnHome};
             Process process = Runtime.getRuntime().exec(binName, envp, binDir);

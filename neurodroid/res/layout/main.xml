@@ -8,7 +8,7 @@
 
     <Button
         android:id="@+id/btnTerm" 
-        android:text="Start terminal session" 
+        android:text="@string/start_terminal" 
         android:layout_width="fill_parent" 
         android:layout_height="wrap_content" 
         android:typeface="normal">
@@ -17,7 +17,7 @@
   <TableRow>
     <Button
         android:id="@+id/btnLoadFile" 
-        android:text="Load hoc file" 
+        android:text="@string/load_hoc" 
         android:layout_width="fill_parent" 
         android:layout_height="wrap_content" 
         android:typeface="normal">
@@ -25,7 +25,7 @@
 
     <Button
         android:id="@+id/btnTestStd" 
-        android:text="Test standard library" 
+        android:text="@string/test_std" 
         android:layout_width="fill_parent" 
         android:layout_height="wrap_content" 
         android:typeface="normal">
@@ -36,7 +36,7 @@
   <TableRow>
     <Button
         android:id="@+id/btnBenchmark" 
-        android:text="Run benchmark" 
+        android:text="@string/run_benchmark" 
         android:layout_width="fill_parent" 
         android:layout_height="wrap_content" 
         android:typeface="normal">
@@ -44,7 +44,7 @@
 
     <Button
         android:id="@+id/btnSquid" 
-        android:text="Squid AP simulation" 
+        android:text="@string/squid_ap_sim" 
         android:layout_width="fill_parent" 
         android:layout_height="wrap_content" 
         android:typeface="normal">

@@ -67,13 +67,13 @@ public class NeuroDroid extends Activity
     public static final String BINDIR = "/data/data/csh.neurodroid";
     public static final String NRNBIN = BINDIR + "/nrniv";
     public static final String NRNHOME = BINDIR + "/nrnhome";
-
+    public static final int TERM_UNAVAILABLE=0, TERM_OUTDATED=1, TERM_AVAILABLE=2;
     public String fHoc;
     
     private static final String[] HOC_ASSETS = {"benchmark.hoc", "squid.hoc"};
     private static final int REQUEST_SAVE=0, REQUEST_LOAD=1, REQUEST_PREFS=2,
         REQUEST_SQUID_BACK=3;
-
+    private static final int DIALOG_MARKETNOTFOUND=0, DIALOG_TERM_UNAVAILABLE=1;
     private ProgressDialog pd;
     private TextView tv;
     private boolean supportsVfp;
@@ -82,7 +82,7 @@ public class NeuroDroid extends Activity
     private String nrnoutput="", nrnversion, curHocFile;
 
     private Resources resources;
-    
+
     /** Called when the activity is first created. */
     @Override public void onCreate(Bundle savedInstanceState) {
 
@@ -110,13 +110,13 @@ public class NeuroDroid extends Activity
 
         /* Get previous vfp state */
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        boolean prevVfp = prefs.getBoolean("checkbox_vfp", true);
-        
+        boolean prevVfp = prefs.getBoolean("cb_vfp", true);
+
         /* Copy the nrniv binary to binDir and make executable.
          * Use vfp only if it's both supported and enabled in the preferences.
          */
         cpNrnBin(supportsVfp && prevVfp);
-        
+
         /* Get version information from NEURON */
         String[] cmdlist = {NRNBIN, "-c", "print nrnversion()"};
         nrnversion = runBinary(cmdlist, NRNHOME);
@@ -129,17 +129,7 @@ public class NeuroDroid extends Activity
                     /* Check whether a new version of the Terminal
                      * Emulator has been installed
                      */
-                    Intent termActivity = findTerm();
-
-                    /* Use builtin if it's not */
-                    if (termActivity == null) {
-                        termActivity = new Intent(getBaseContext(),
-                                                  Term.class);
-                    }
-
-                    String initCmd = "cd /data/data/csh.neurodroid/ && NEURONHOME=" + NRNHOME + " ./nrniv";
-                    termActivity.putExtra("jackpal.androidterm.iInitialCommand", initCmd);
-                    startActivity(termActivity);
+                    launchTerm();
                 }});
 
         /* Load hoc file using a simple file dialog */
@@ -207,6 +197,43 @@ public class NeuroDroid extends Activity
         }
     }
     
+    @Override protected Dialog onCreateDialog(int id) {
+        switch (id) {
+         case DIALOG_TERM_UNAVAILABLE:
+             return new AlertDialog.Builder(NeuroDroid.this)
+                 .setIcon(R.drawable.app_terminal)
+                 .setTitle(R.string.app_terminal_missing)
+                 .setPositiveButton(R.string.app_terminal_get, new DialogInterface.OnClickListener() {
+                         public void onClick(DialogInterface dialog, int whichButton) {
+                             Intent intent = new Intent(Intent.ACTION_VIEW,
+                                                        Uri.parse("market://details?id=jackpal.androidterm"));
+                             try {
+                                 startActivity(intent);
+                             } catch (ActivityNotFoundException e) {
+                                 showDialog(DIALOG_MARKETNOTFOUND);
+                             }
+                         }
+                     })
+                 .setNegativeButton(R.string.app_terminal_builtin, new DialogInterface.OnClickListener() {
+                         public void onClick(DialogInterface dialog, int whichButton) {
+                             runTerm(new Intent(getBaseContext(), Term.class));
+                         }
+                     })
+                 .create();
+         case DIALOG_MARKETNOTFOUND:
+             return new AlertDialog.Builder(NeuroDroid.this)
+                 .setIcon(android.R.drawable.ic_dialog_alert)
+                 .setTitle(R.string.market_missing)
+                 .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                         public void onClick(DialogInterface dialog, int whichButton) {
+                             /* Return silently */
+                         }
+                     })
+                 .create();
+        }
+        return null;
+    }
+
     /** Creates an options menu */
     @Override public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
@@ -273,24 +300,52 @@ public class NeuroDroid extends Activity
             
     }
 
-    private Intent findTerm() {
-        Intent intent = new Intent(Intent.ACTION_MAIN);
+    private void launchTerm() {
+        /* If Terminal Emulator is not installed, offer to download */
+        if (hasExtterm(getBaseContext())!=TERM_AVAILABLE) {
+            showDialog(DIALOG_TERM_UNAVAILABLE);
+        } else {
+            ComponentName termComp = new ComponentName("jackpal.androidterm", "jackpal.androidterm.Term");
+            try {
+                PackageInfo pinfo = getBaseContext().getPackageManager().getPackageInfo(termComp.getPackageName(), 0);
+                String patchVersion = pinfo.versionName;
+                Log.v(TAG, "Terminal Emulator version: " + patchVersion);
+                int patchCode = pinfo.versionCode;
+
+                if (patchCode < 32) {
+                    runTerm(new Intent(getBaseContext(), Term.class));
+                } else {
+                    Intent intent = new Intent(Intent.ACTION_MAIN);
+                    intent.setComponent(termComp);
+                    runTerm(intent);
+                }
+
+            } catch (PackageManager.NameNotFoundException e) {
+                runTerm(new Intent(getBaseContext(), Term.class));
+            }
+        }
+    }
+
+    private void runTerm(Intent intent) {
+        String initCmd = "cd /data/data/csh.neurodroid/ && NEURONHOME=" + NRNHOME + " ./nrniv";
+        intent.putExtra("jackpal.androidterm.iInitialCommand", initCmd);
+        startActivity(intent);
+    }
+
+    public static int hasExtterm(Context context) {
         ComponentName termComp = new ComponentName("jackpal.androidterm", "jackpal.androidterm.Term");
         try {
-            PackageInfo pinfo = getBaseContext().getPackageManager().getPackageInfo(termComp.getPackageName(), 0);
+            PackageInfo pinfo = context.getPackageManager().getPackageInfo(termComp.getPackageName(), 0);
             String patchVersion = pinfo.versionName;
-            Log.v(TAG, "Terminal Emulator version: " + patchVersion);
             int patchCode = pinfo.versionCode;
 
             if (patchCode < 32) {
-                return null;
+                return TERM_OUTDATED;
+            } else {
+                return TERM_AVAILABLE;
             }
-
-            return intent;
         } catch (PackageManager.NameNotFoundException e) {
-            return null;
-        } catch (ActivityNotFoundException e) {
-            return null;
+            return TERM_UNAVAILABLE;
         }
     }
     

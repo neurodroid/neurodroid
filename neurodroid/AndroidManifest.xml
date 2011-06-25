@@ -3,7 +3,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android" package="csh.neurodroid"
     android:versionCode="06"
     android:versionName="0.6">
-  <uses-sdk android:minSdkVersion="4" />
+  <uses-sdk android:minSdkVersion="8" />
 
   <application
       android:icon="@drawable/ic_launcher_neurodroid"

@@ -27,11 +27,11 @@ import android.widget.Toast;
 
 public class Preferences extends PreferenceActivity {
 
-    private CheckBoxPreference chkEnableVfp;
+    private CheckBoxPreference chkEnableVfp; //, chkEnableExtterm;
     private boolean supportsVfp;
+    /* private int supportsExtterm;*/
     
-    @Override
-        protected void onCreate(Bundle savedInstanceState) {
+    @Override protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         addPreferencesFromResource(R.xml.preferences);
 
@@ -43,25 +43,28 @@ public class Preferences extends PreferenceActivity {
             supportsVfp = false;
         }
 
-        /* Get previous vfp state */
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        boolean prevVfp = prefs.getBoolean("checkbox_vfp", true);
+        /* supportsExtterm = NeuroDroid.hasExtterm(getBaseContext());*/
         
+        /* Get previous states */
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        boolean prevVfp = prefs.getBoolean("cb_vfp", true);
+        /* boolean prevExtterm = prefs.getBoolean("cb_extterm", false);*/
+            
         /* Initialise vfp status */
-        chkEnableVfp = (CheckBoxPreference)getPreferenceScreen().findPreference("checkbox_vfp");
+        chkEnableVfp = (CheckBoxPreference)getPreferenceScreen().findPreference("cb_vfp");
         if (supportsVfp) {
             chkEnableVfp.setEnabled(true);
             chkEnableVfp.setChecked(prevVfp);
         } else {
             chkEnableVfp.setEnabled(false);
             chkEnableVfp.setChecked(false);
-            chkEnableVfp.setSummary("Your cpu doesn't support vfp extensions");
+            chkEnableVfp.setSummary(getBaseContext().getString(R.string.cb_vfp_summary_disabled));
         }
         chkEnableVfp.setOnPreferenceClickListener(new OnPreferenceClickListener() {
                 public boolean onPreferenceClick(Preference preference) {
                     if (!supportsVfp) {
                         chkEnableVfp.setChecked(false);
-                        Toast.makeText(Preferences.this, "Your cpu doesn't support vfp instructions", Toast.LENGTH_LONG).show();
+                        Toast.makeText(Preferences.this, getBaseContext().getString(R.string.cb_vfp_summary_disabled), Toast.LENGTH_LONG).show();
                         return false;
                     } else {
                         if (chkEnableVfp.isChecked()) {
@@ -76,5 +79,40 @@ public class Preferences extends PreferenceActivity {
                     }
                 }});
         
+        /* Initialise extterm status
+        chkEnableExtterm = (CheckBoxPreference)getPreferenceScreen().findPreference("cb_extterm");
+        switch (supportsExtterm) {
+         case NeuroDroid.TERM_AVAILABLE:
+            chkEnableExtterm.setEnabled(true);
+            chkEnableExtterm.setChecked(prevExtterm);
+            break;
+         case NeuroDroid.TERM_UNAVAILABLE:
+            chkEnableExtterm.setEnabled(false);
+            chkEnableExtterm.setChecked(false);
+            chkEnableExtterm.setSummary(getBaseContext().getString(R.string.cb_extterm_summary_unavailable));
+            break;
+         case NeuroDroid.TERM_OUTDATED:
+            chkEnableExtterm.setEnabled(false);
+            chkEnableExtterm.setChecked(false);
+            chkEnableExtterm.setSummary(getBaseContext().getString(R.string.cb_extterm_summary_outdated));
+            break;
+        }
+
+        chkEnableExtterm.setOnPreferenceClickListener(new OnPreferenceClickListener() {
+                public boolean onPreferenceClick(Preference preference) {
+                    if (supportsExtterm!=NeuroDroid.TERM_AVAILABLE) {
+                        chkEnableExtterm.setChecked(false);
+                        return false;
+                    } else {
+                        if (chkEnableExtterm.isChecked()) {
+                            Toast.makeText(Preferences.this, "Using external terminal", Toast.LENGTH_SHORT).show();
+                            return true;
+                        } else {
+                            Toast.makeText(Preferences.this, "Using built-in terminal", Toast.LENGTH_SHORT).show();
+                            return false;
+                        }
+                    }
+                }});
+        */
     }
 }

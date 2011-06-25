@@ -6,8 +6,13 @@
     <!-- Options Menu -->
     <string name="pref_name">Neurodroid preferences</string>
     <string name="preferences">Preferences</string>
-    <string name="title_vfp_checkbox">vfp</string>
-    <string name="summary_vfp_checkbox">Enable vfp support</string>
+    <string name="cb_vfp_title">vfp</string>
+    <string name="cb_vfp_summary">Enable vfp support</string>
+    <string name="cb_vfp_summary_disabled">Your cpu doesn\'t support vfp extensions</string>
+    <string name="cb_extterm_title">External terminal</string>
+    <string name="cb_extterm_summary">Use external terminal emulator</string>
+    <string name="cb_extterm_summary_outdated">Terminal emulator is outdated. Please update.</string>
+    <string name="cb_extterm_summary_unavailable">Terminal emulator is not installed. You can get it from the Market.</string>
     <string name="about_menu">About</string>
 
     <!-- File Browser -->
@@ -30,8 +35,9 @@
     <string name="squid_ap_sim">Squid AP simulation</string>
 
     <!-- Terminal emulator -->
-    <string name="app_terminal_missing">Terminal emulator missing</string>
-    <string name="app_terminal_get">Get Terminal</string>
+    <string name="app_terminal_missing">Terminal emulator not installed or outdated.</string>
+    <string name="app_terminal_get">Go to Market</string>
+    <string name="app_terminal_builtin">Use built-in terminal</string>
     <string name="app_terminal_patch_missing">Couldn\'t find patched terminal emulator</string>
     <string name="app_terminal_patch_get">Get patched terminal</string>
     <string name="market_missing">Google Market wasn\'t found on your device</string>

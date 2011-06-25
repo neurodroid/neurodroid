@@ -4,8 +4,13 @@
     xmlns:android="http://schemas.android.com/apk/res/android">
   
   <CheckBoxPreference
-      android:key="checkbox_vfp"
-      android:title="@string/title_vfp_checkbox"
-      android:summary="@string/summary_vfp_checkbox" />
+      android:key="cb_vfp"
+      android:title="@string/cb_vfp_title"
+      android:summary="@string/cb_vfp_summary" />
+  
+  <!-- CheckBoxPreference
+      android:key="cb_extterm"
+      android:title="@string/cb_extterm_title"
+      android:summary="@string/cb_extterm_summary" / -->
   
 </PreferenceScreen>

@@ -1,12 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">neurodroid</string>
+    <string name="about">NEURON for Android\nChristoph Schmidt-Hieber\nhttp://code.google.com/p/neurodroid\n\nBased on NEURON\nhttp://www.neuron.yale.edu\n\nAndroid Terminal Emulator by Google and Jack Palevich\nhttps://github.com/jackpal/Android-Terminal-Emulator/wiki\n\nGraphView based on code by Arno den Hond\n\nUnZip based on code by Ian Darwin\n\nFileDialog based on code by Alexander Ponomarev</string>
 
     <!-- Options Menu -->
     <string name="pref_name">Neurodroid preferences</string>
     <string name="preferences">Preferences</string>
     <string name="title_vfp_checkbox">vfp</string>
     <string name="summary_vfp_checkbox">Enable vfp support</string>
+    <string name="about_menu">About</string>
 
     <!-- File Browser -->
     <string name="fb_name">File Browser</string>

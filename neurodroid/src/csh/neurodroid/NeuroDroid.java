@@ -54,6 +54,11 @@ import android.preference.PreferenceManager;
 
 import android.net.Uri;
 
+import android.text.SpannableString;
+import android.text.util.Linkify;
+
+import android.graphics.drawable.Drawable;
+
 public class NeuroDroid extends Activity
 {
 
@@ -218,6 +223,16 @@ public class NeuroDroid extends Activity
                                                   Preferences.class);
              startActivityForResult(settingsActivity, REQUEST_PREFS);
              return true;
+         case R.id.about:
+             AlertDialog builder;
+             try {
+                 builder = AboutDialogBuilder.create(this);
+                 builder.show();
+                 return true;
+             } catch (PackageManager.NameNotFoundException e) {
+                 // TODO Auto-generated catch block
+                 return false;
+             }
          default:
              return super.onOptionsItemSelected(item);
         }
@@ -552,6 +567,29 @@ public class NeuroDroid extends Activity
         String chmodout = runBinary(chmodlist, NRNHOME);
     }
 
+    private static class AboutDialogBuilder {
+        public static AlertDialog create(Context context) throws PackageManager.NameNotFoundException {
+            PackageInfo pInfo = context.getPackageManager().
+                getPackageInfo(context.getPackageName(), PackageManager.GET_META_DATA);
+            Drawable pIcon = context.getPackageManager().
+                getApplicationIcon(context.getPackageName());
+            String aboutTitle = String.format("%s %s", context.getString(R.string.app_name), pInfo.versionName);
+            String aboutText = context.getString(R.string.about);
+
+            final TextView message = new TextView(context);
+            final SpannableString s = new SpannableString(aboutText);
+
+            message.setPadding(5, 5, 5, 5);
+            message.setText(s);
+            Linkify.addLinks(message, Linkify.ALL);
+
+            return new AlertDialog.Builder(context).setTitle(aboutTitle).
+                setIcon(pIcon).
+                setCancelable(true).
+                setPositiveButton(context.getString(android.R.string.ok), null).
+                setView(message).create();
+        }
+    }
     /* Load libraries for native part of the app.
      */
     static {

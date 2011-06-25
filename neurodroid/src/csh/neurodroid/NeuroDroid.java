@@ -65,12 +65,9 @@ public class NeuroDroid extends Activity
 
     public String fHoc;
     
-    private static final boolean TERMPATCH = true;
     private static final String[] HOC_ASSETS = {"benchmark.hoc", "squid.hoc"};
     private static final int REQUEST_SAVE=0, REQUEST_LOAD=1, REQUEST_PREFS=2,
         REQUEST_SQUID_BACK=3;
-    private static final int DIALOG_ANDROIDTERM=0, DIALOG_MARKETNOTFOUND=1,
-        DIALOG_ANDROIDTERMPATCH=2;
 
     private ProgressDialog pd;
     private TextView tv;
@@ -124,38 +121,20 @@ public class NeuroDroid extends Activity
         Button buttonTerm = (Button)findViewById(R.id.btnTerm);
         buttonTerm.setOnClickListener(new OnClickListener() {
                 public void onClick(View v) {
-                    Intent intent = new Intent(Intent.ACTION_MAIN);
-                    ComponentName termComp = new ComponentName("jackpal.androidterm", "jackpal.androidterm.Term");
-                    int dlgid = DIALOG_ANDROIDTERM;
-                    /* For the time being, check whether this is a patched version of the terminal emulator */
-                    if (NeuroDroid.TERMPATCH) {
-                        dlgid = DIALOG_ANDROIDTERMPATCH;
+                    /* Check whether a new version of the Terminal
+                     * Emulator has been installed
+                     */
+                    Intent termActivity = findTerm();
+
+                    /* Use builtin if it's not */
+                    if (termActivity == null) {
+                        termActivity = new Intent(getBaseContext(),
+                                                  Term.class);
                     }
-                    try {
-                        /* We can use patched or newer versions of the terminal */
-                        PackageInfo pinfo = getBaseContext().getPackageManager().getPackageInfo(termComp.getPackageName(), 0);
-                        String patchVersion = pinfo.versionName;
-                        Log.v(TAG, "Terminal Emulator version: " + patchVersion);
-                        int patchCode = pinfo.versionCode;
-                        /* Throw exception if it's unpatched and outdated */
-                        if ( !patchVersion.endsWith("csh") && patchCode < 32) {
-                            throw new PackageManager.NameNotFoundException();
-                        }
-                        
-                        /* Launch neuron in terminal emulator */
-                        intent.setComponent(termComp);
-                        String initCmd = "cd /data/data/csh.neurodroid/ && NEURONHOME=" + NRNHOME + " ./nrniv";
-                        intent.putExtra("jackpal.androidterm.iInitialCommand", initCmd);
-                        startActivity(intent);
-                    } catch (PackageManager.NameNotFoundException e) {
-                        showDialog(dlgid);
-                        tv.setText(nrnversion + "\n" +
-                                   "Couldn't find Android Terminal Emulator.");
-                    } catch (ActivityNotFoundException e) {
-                        showDialog(dlgid);
-                        tv.setText(nrnversion + "\n" +
-                                   "Couldn't find Android Terminal Emulator.");
-                    }
+
+                    String initCmd = "cd /data/data/csh.neurodroid/ && NEURONHOME=" + NRNHOME + " ./nrniv";
+                    termActivity.putExtra("jackpal.androidterm.iInitialCommand", initCmd);
+                    startActivity(termActivity);
                 }});
 
         /* Load hoc file using a simple file dialog */
@@ -223,62 +202,6 @@ public class NeuroDroid extends Activity
         }
     }
     
-    @Override protected Dialog onCreateDialog(int id) {
-        switch (id) {
-         case DIALOG_ANDROIDTERM:
-             return new AlertDialog.Builder(NeuroDroid.this)
-                 .setIcon(R.drawable.app_terminal)
-                 .setTitle(R.string.app_terminal_missing)
-                 .setPositiveButton(R.string.app_terminal_get, new DialogInterface.OnClickListener() {
-                         public void onClick(DialogInterface dialog, int whichButton) {
-                             Intent intent = new Intent(Intent.ACTION_VIEW,
-                                                        Uri.parse("market://details?id=jackpal.androidterm"));
-                             try {
-                                 startActivity(intent);
-                             } catch (ActivityNotFoundException e) {
-                                 showDialog(DIALOG_MARKETNOTFOUND);
-                             }
-                         }
-                     })
-                 .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-                         public void onClick(DialogInterface dialog, int whichButton) {
-
-                             /* Return silently */
-                         }
-                     })
-                 .create();
-         case DIALOG_ANDROIDTERMPATCH:
-             return new AlertDialog.Builder(NeuroDroid.this)
-                 .setIcon(R.drawable.app_terminal)
-                 .setTitle(R.string.app_terminal_patch_missing)
-                 .setPositiveButton(R.string.app_terminal_patch_get, new DialogInterface.OnClickListener() {
-                         public void onClick(DialogInterface dialog, int whichButton) {
-                             Intent intent = new Intent(Intent.ACTION_VIEW,
-                                                        Uri.parse("http://code.google.com/p/neurodroid/downloads/list"));
-                             startActivity(intent);
-                         }
-                     })
-                 .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-                         public void onClick(DialogInterface dialog, int whichButton) {
-
-                             /* Return silently */
-                         }
-                     })
-                 .create();
-         case DIALOG_MARKETNOTFOUND:
-             return new AlertDialog.Builder(NeuroDroid.this)
-                 .setIcon(android.R.drawable.ic_dialog_alert)
-                 .setTitle(R.string.market_missing)
-                 .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-                         public void onClick(DialogInterface dialog, int whichButton) {
-                             /* Return silently */
-                         }
-                     })
-                 .create();
-        }
-        return null;
-    }
-    
     /** Creates an options menu */
     @Override public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
@@ -333,6 +256,27 @@ public class NeuroDroid extends Activity
                 }
             }).start();
             
+    }
+
+    private Intent findTerm() {
+        Intent intent = new Intent(Intent.ACTION_MAIN);
+        ComponentName termComp = new ComponentName("jackpal.androidterm", "jackpal.androidterm.Term");
+        try {
+            PackageInfo pinfo = getBaseContext().getPackageManager().getPackageInfo(termComp.getPackageName(), 0);
+            String patchVersion = pinfo.versionName;
+            Log.v(TAG, "Terminal Emulator version: " + patchVersion);
+            int patchCode = pinfo.versionCode;
+
+            if (patchCode < 32) {
+                return null;
+            }
+
+            return intent;
+        } catch (PackageManager.NameNotFoundException e) {
+            return null;
+        } catch (ActivityNotFoundException e) {
+            return null;
+        }
     }
     
     public static boolean cpuSupportsVfp() throws IOException {

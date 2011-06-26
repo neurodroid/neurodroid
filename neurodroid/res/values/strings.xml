@@ -9,10 +9,8 @@
     <string name="cb_vfp_title">vfp</string>
     <string name="cb_vfp_summary">Enable vfp support</string>
     <string name="cb_vfp_summary_disabled">Your cpu doesn\'t support vfp extensions</string>
-    <string name="cb_extterm_title">External terminal</string>
-    <string name="cb_extterm_summary">Use external terminal emulator</string>
-    <string name="cb_extterm_summary_outdated">Terminal emulator is outdated. Please update.</string>
-    <string name="cb_extterm_summary_unavailable">Terminal emulator is not installed. You can get it from the Market.</string>
+    <string name="cb_builtin_title">Use built-in terminal</string>
+    <string name="cb_builtin_summary">Always use the built-in terminal emulator</string>
     <string name="about_menu">About</string>
 
     <!-- File Browser -->

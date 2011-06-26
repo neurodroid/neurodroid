@@ -8,9 +8,9 @@
       android:title="@string/cb_vfp_title"
       android:summary="@string/cb_vfp_summary" />
   
-  <!-- CheckBoxPreference
-      android:key="cb_extterm"
-      android:title="@string/cb_extterm_title"
-      android:summary="@string/cb_extterm_summary" / -->
+  <CheckBoxPreference
+      android:key="cb_builtin"
+      android:title="@string/cb_builtin_title"
+      android:summary="@string/cb_builtin_summary" />
   
 </PreferenceScreen>

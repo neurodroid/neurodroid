@@ -302,27 +302,36 @@ public class NeuroDroid extends Activity
     }
 
     private void launchTerm() {
-        /* If Terminal Emulator is not installed, offer to download */
-        if (hasExtterm(getBaseContext())!=TERM_AVAILABLE) {
-            showDialog(DIALOG_TERM_UNAVAILABLE);
+        SharedPreferences prefs = getBaseContext().getSharedPreferences("csh.neurodroid_preferences", 0);
+        boolean useBuiltin = prefs.getBoolean("cb_builtin", false);
+        Intent builtinTerm = new Intent(getBaseContext(), Term.class); 
+        if (useBuiltin) {
+            runTerm(builtinTerm);
         } else {
-            ComponentName termComp = new ComponentName("jackpal.androidterm", "jackpal.androidterm.Term");
-            try {
-                PackageInfo pinfo = getBaseContext().getPackageManager().getPackageInfo(termComp.getPackageName(), 0);
-                String patchVersion = pinfo.versionName;
-                Log.v(TAG, "Terminal Emulator version: " + patchVersion);
-                int patchCode = pinfo.versionCode;
+            /* If Terminal Emulator is not installed or outdated,
+             * offer to download
+             */
+            if (!useBuiltin && hasExtterm(getBaseContext())!=TERM_AVAILABLE) {
+                showDialog(DIALOG_TERM_UNAVAILABLE);
+            } else {
+                ComponentName termComp = new ComponentName("jackpal.androidterm", "jackpal.androidterm.Term");
+                try {
+                    PackageInfo pinfo = getBaseContext().getPackageManager().getPackageInfo(termComp.getPackageName(), 0);
+                    String patchVersion = pinfo.versionName;
+                    Log.v(TAG, "Terminal Emulator version: " + patchVersion);
+                    int patchCode = pinfo.versionCode;
 
-                if (patchCode < 32) {
-                    runTerm(new Intent(getBaseContext(), Term.class));
-                } else {
-                    Intent intent = new Intent(Intent.ACTION_MAIN);
-                    intent.setComponent(termComp);
-                    runTerm(intent);
+                    if (patchCode < 32) {
+                        runTerm(builtinTerm);
+                    } else {
+                        Intent intent = new Intent(Intent.ACTION_MAIN);
+                        intent.setComponent(termComp);
+                        runTerm(intent);
+                    }
+
+                } catch (PackageManager.NameNotFoundException e) {
+                    runTerm(builtinTerm);
                 }
-
-            } catch (PackageManager.NameNotFoundException e) {
-                runTerm(new Intent(getBaseContext(), Term.class));
             }
         }
     }

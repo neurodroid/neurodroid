@@ -29,9 +29,8 @@ public class Preferences extends PreferenceActivity {
 
     private SharedPreferences prefs;
     
-    private CheckBoxPreference chkEnableVfp; //, chkEnableExtterm;
+    private CheckBoxPreference chkEnableVfp, chkEnableBuiltin;
     private boolean supportsVfp;
-    /* private int supportsExtterm;*/
     
     @Override protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -45,12 +44,10 @@ public class Preferences extends PreferenceActivity {
             supportsVfp = false;
         }
 
-        /* supportsExtterm = NeuroDroid.hasExtterm(getBaseContext());*/
-        
         /* Get previous states */
         prefs = getBaseContext().getSharedPreferences("csh.neurodroid_preferences", 0);
         boolean prevVfp = prefs.getBoolean("cb_vfp", true);
-        /* boolean prevExtterm = prefs.getBoolean("cb_extterm", false);*/
+        boolean prevBuiltin = prefs.getBoolean("cb_builtin", false);
             
         /* Initialise vfp status */
         chkEnableVfp = (CheckBoxPreference)getPreferenceScreen().findPreference("cb_vfp");
@@ -79,38 +76,16 @@ public class Preferences extends PreferenceActivity {
                     }
                 }});
         
-        /* Initialise extterm status
-        chkEnableExtterm = (CheckBoxPreference)getPreferenceScreen().findPreference("cb_extterm");
-        switch (supportsExtterm) {
-         case NeuroDroid.TERM_AVAILABLE:
-            chkEnableExtterm.setEnabled(true);
-            chkEnableExtterm.setChecked(prevExtterm);
-            break;
-         case NeuroDroid.TERM_UNAVAILABLE:
-            chkEnableExtterm.setEnabled(false);
-            chkEnableExtterm.setChecked(false);
-            chkEnableExtterm.setSummary(getBaseContext().getString(R.string.cb_extterm_summary_unavailable));
-            break;
-         case NeuroDroid.TERM_OUTDATED:
-            chkEnableExtterm.setEnabled(false);
-            chkEnableExtterm.setChecked(false);
-            chkEnableExtterm.setSummary(getBaseContext().getString(R.string.cb_extterm_summary_outdated));
-            break;
-        }
-
-        chkEnableExtterm.setOnPreferenceClickListener(new OnPreferenceClickListener() {
+        /* Initialise extterm status */
+        chkEnableBuiltin = (CheckBoxPreference)getPreferenceScreen().findPreference("cb_builtin");
+        chkEnableBuiltin.setOnPreferenceClickListener(new OnPreferenceClickListener() {
                 public boolean onPreferenceClick(Preference preference) {
-                    if (supportsExtterm!=NeuroDroid.TERM_AVAILABLE) {
-                        chkEnableExtterm.setChecked(false);
-                        return false;
+                    if (chkEnableBuiltin.isChecked()) {
+                        Toast.makeText(Preferences.this, "Always using built-in terminal", Toast.LENGTH_SHORT).show();
+                        return true;
                     } else {
-                        if (chkEnableExtterm.isChecked()) {
-                            Toast.makeText(Preferences.this, "Using external terminal", Toast.LENGTH_SHORT).show();
-                            return true;
-                        } else {
-                            Toast.makeText(Preferences.this, "Using built-in terminal", Toast.LENGTH_SHORT).show();
-                            return false;
-                        }
+                        Toast.makeText(Preferences.this, "Using external terminal (if available)", Toast.LENGTH_SHORT).show();
+                        return false;
                     }
                 }});
         */

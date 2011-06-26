@@ -76,7 +76,6 @@ public class Preferences extends PreferenceActivity {
                     }
                 }});
         
-        /* Initialise extterm status */
         chkEnableBuiltin = (CheckBoxPreference)getPreferenceScreen().findPreference("cb_builtin");
         chkEnableBuiltin.setOnPreferenceClickListener(new OnPreferenceClickListener() {
                 public boolean onPreferenceClick(Preference preference) {
@@ -88,6 +87,5 @@ public class Preferences extends PreferenceActivity {
                         return false;
                     }
                 }});
-        */
     }
 }

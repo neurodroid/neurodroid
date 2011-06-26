@@ -35,16 +35,17 @@ use strict;
 
 # Dance around to find the actual android toolchain path (it's very
 # deep, so links on $PATH are going to be common.
-my $GCC = `which arm-linux-androideabi-gcc`;
+my $GCC = `which arm-eabi-gcc`;
 $GCC = qx(cd `dirname $GCC`; /bin/pwd);
 chomp $GCC;
-die "bad arm-linux-androideabi-gcc path" if $GCC !~ /(.*)\/prebuilt\//;
+die "bad arm-eabi-gcc path" if $GCC !~ /(.*)\/prebuilt\//;
 my $HOME = "/home/cs";
 my $DROID = "$HOME/android-cm/system"; #$1;
 my $TARGET = "android-8";
-my $ALIB = "$DROID/out/target/product/p990/obj/lib";
-my $NDK = "$HOME/android-ndk-r5b";
-my $TOOLCHAIN = "$NDK/toolchains/arm-linux-androideabi-4.4.3/prebuilt/linux-x86";
+my $NDK = "$HOME/android-ndk-r5c";
+# my $ALIB = "$DROID/out/target/product/p990/obj/lib";
+my $ALIB = "$NDK/platforms/$TARGET/arch-arm/usr/lib";
+my $TOOLCHAIN = "$NDK/toolchains/arm-eabi-4.4.0/prebuilt/linux-x86";
 
 my @include_paths = (
       "-I$NDK/platforms/$TARGET/arch-arm/usr/include");
@@ -58,7 +59,7 @@ my @preprocess_args = (
     "-DANDROID",
     "-DSK_RELEASE",
     "-DNDEBUG",
-    "-include", "$DROID/system/core/include/arch/linux-arm/AndroidConfig.h",
+    # "-include", "$DROID/system/core/include/arch/linux-arm/AndroidConfig.h",
     "-UDEBUG");
 
 my @warn_args = (
@@ -166,7 +167,7 @@ if($mode eq "-shared") { $need_shlink = 1; }
 if($have_src and $mode ne "-E") { $need_cpp = $need_compile = 1; }
 
 # Assemble the command:
-my @cmd = ("arm-linux-androideabi-gcc");
+my @cmd = ("arm-eabi-gcc");
 if($mode ne "DEFAULT") { @cmd = (@cmd, $mode); }
 if(defined $out) { @cmd = (@cmd, "-o", $out); }
 if($need_cpp) { @cmd = (@cmd, @include_paths, @preprocess_args); }

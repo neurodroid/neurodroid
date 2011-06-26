@@ -42,7 +42,7 @@ die "bad arm-eabi-gcc path" if $GCC !~ /(.*)\/prebuilt\//;
 my $HOME = "/home/cs";
 my $DROID = "$HOME/android-cm/system"; #$1;
 my $TARGET = "android-8";
-my $NDK = "$HOME/android-ndk-r5b";
+my $NDK = "$HOME/android-ndk-r5c";
 # my $ALIB = "$DROID/out/target/product/p990/obj/lib";
 my $ALIB = "$NDK/platforms/$TARGET/arch-arm/usr/lib";
 my $TOOLCHAIN = "$NDK/toolchains/arm-eabi-4.4.0/prebuilt/linux-x86";

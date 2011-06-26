@@ -116,7 +116,7 @@ public class NeuroDroid extends Activity
         /* Copy the nrniv binary to binDir and make executable.
          * Use vfp only if it's both supported and enabled in the preferences.
          */
-        cpNrnBin(supportsVfp && prevVfp, getAssets());
+        cpNrnBin(supportsVfp && prevVfp);
 
         /* Get version information from NEURON */
         String[] cmdlist = {NRNBIN, "-c", "print nrnversion()"};
@@ -139,7 +139,7 @@ public class NeuroDroid extends Activity
                 public void onClick(View v) {
                     Intent intent = new Intent(getBaseContext(),
                                                FileDialog.class);
-                    intent.putExtra(FileDialog.START_PATH, "/sdcard");
+                    intent.putExtra(FileDialog.START_PATH, "/");
                     startActivityForResult(intent, REQUEST_LOAD);
                 }});
 
@@ -568,7 +568,7 @@ public class NeuroDroid extends Activity
          case REQUEST_PREFS:
              SharedPreferences prefs = getBaseContext().getSharedPreferences("csh.neurodroid_preferences", 0);
              boolean useVfp = prefs.getBoolean("cb_vfp", true);
-             cpNrnBin(useVfp, getAssets());
+             cpNrnBin(useVfp && supportsVfp);
              if (useVfp) {
                  Log.v(TAG, "Vfp enabled through options");
              } else {
@@ -583,7 +583,7 @@ public class NeuroDroid extends Activity
     }
 
     /** Copy nrniv to binDir and make executable */
-    public static void cpNrnBin(boolean withVfp, AssetManager assets) {
+    public void cpNrnBin(boolean withVfp) {
         String arch = "armeabi";
         if (withVfp) {
             arch += "-v7a";
@@ -597,13 +597,13 @@ public class NeuroDroid extends Activity
         /* Catenate split files */
         Log.v(TAG, "Looking for assets in " + arch);
         try {
-            String[] assetsFiles = assets.list(arch);
+            String[] assetsFiles = getAssets().list(arch);
 
             File newf = new File(NRNBIN);
             FileOutputStream os = new FileOutputStream(newf);
             for (String assetsFile : assetsFiles) {
                 Log.v(TAG, "Found NEURON binary part: " + assetsFile);
-                InputStream is = assets.open(arch + "/" + assetsFile);
+                InputStream is = getAssets().open(arch + "/" + assetsFile);
 
                 byte[] buffer = new byte[is.available()]; 
 

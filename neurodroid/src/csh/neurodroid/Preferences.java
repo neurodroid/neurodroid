@@ -27,6 +27,8 @@ import android.widget.Toast;
 
 public class Preferences extends PreferenceActivity {
 
+    private SharedPreferences prefs;
+    
     private CheckBoxPreference chkEnableVfp; //, chkEnableExtterm;
     private boolean supportsVfp;
     /* private int supportsExtterm;*/
@@ -46,7 +48,7 @@ public class Preferences extends PreferenceActivity {
         /* supportsExtterm = NeuroDroid.hasExtterm(getBaseContext());*/
         
         /* Get previous states */
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        prefs = getBaseContext().getSharedPreferences("csh.neurodroid_preferences", 0);
         boolean prevVfp = prefs.getBoolean("cb_vfp", true);
         /* boolean prevExtterm = prefs.getBoolean("cb_extterm", false);*/
             
@@ -68,11 +70,9 @@ public class Preferences extends PreferenceActivity {
                         return false;
                     } else {
                         if (chkEnableVfp.isChecked()) {
-                            /* NeuroDroid.cpNrnBin(true); */
                             Toast.makeText(Preferences.this, "vfp support enabled", Toast.LENGTH_SHORT).show();
                             return true;
                         } else {
-                            /* NeuroDroid.cpNrnBin(false); */
                             Toast.makeText(Preferences.this, "vfp support disabled", Toast.LENGTH_SHORT).show();
                             return false;
                         }

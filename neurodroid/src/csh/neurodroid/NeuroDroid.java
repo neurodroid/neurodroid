@@ -47,6 +47,7 @@ import android.content.Context;
 import android.content.ComponentName;
 import android.content.ActivityNotFoundException;
 import android.content.res.Resources;
+import android.content.res.AssetManager;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageInfo;
 
@@ -109,13 +110,13 @@ public class NeuroDroid extends Activity
         }
 
         /* Get previous vfp state */
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        SharedPreferences prefs = getBaseContext().getSharedPreferences("csh.neurodroid_preferences", 0);
         boolean prevVfp = prefs.getBoolean("cb_vfp", true);
 
         /* Copy the nrniv binary to binDir and make executable.
          * Use vfp only if it's both supported and enabled in the preferences.
          */
-        cpNrnBin(supportsVfp && prevVfp);
+        cpNrnBin(supportsVfp && prevVfp, getAssets());
 
         /* Get version information from NEURON */
         String[] cmdlist = {NRNBIN, "-c", "print nrnversion()"};
@@ -386,7 +387,7 @@ public class NeuroDroid extends Activity
         return strContent.toString();
     }
     
-    /* Copy an assets file to the cache directory */
+    /** Copy an assets file to the cache directory */
     public void saveAssetsFile(String src, String target) {
 
         String newfn;
@@ -416,8 +417,8 @@ public class NeuroDroid extends Activity
         return runBinary(binName, nrnHome, false);
     }
 
-    /* Run a binary using binDir as the wd. Return stdout
-     * and optinally stderr
+    /** Run a binary using binDir as the wd. Return stdout
+     *  and optinally stderr
      */
     public static String runBinary(String[] binName, String nrnHome, boolean stderr) {
         try {
@@ -494,8 +495,8 @@ public class NeuroDroid extends Activity
         return flArray;
     }
     
-    /* Install NEURON std lib that is included as a zip
-     * file in the assets
+    /** Install NEURON std lib that is included as a zip
+     *  file in the assets
      */
     public void installStdLib() {
         String newfn = CACHEDIR + "/lib.zip";
@@ -565,9 +566,9 @@ public class NeuroDroid extends Activity
              }
              break;
          case REQUEST_PREFS:
-             SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-             boolean useVfp = prefs.getBoolean("checkbox_vfp", true);
-             cpNrnBin(useVfp);
+             SharedPreferences prefs = getBaseContext().getSharedPreferences("csh.neurodroid_preferences", 0);
+             boolean useVfp = prefs.getBoolean("cb_vfp", true);
+             cpNrnBin(useVfp, getAssets());
              if (useVfp) {
                  Log.v(TAG, "Vfp enabled through options");
              } else {
@@ -581,8 +582,8 @@ public class NeuroDroid extends Activity
         }
     }
 
-    /* Copy nrniv to binDir and make executable */
-    public void cpNrnBin(boolean withVfp) {
+    /** Copy nrniv to binDir and make executable */
+    public static void cpNrnBin(boolean withVfp, AssetManager assets) {
         String arch = "armeabi";
         if (withVfp) {
             arch += "-v7a";
@@ -596,13 +597,13 @@ public class NeuroDroid extends Activity
         /* Catenate split files */
         Log.v(TAG, "Looking for assets in " + arch);
         try {
-            String[] assetsFiles = getAssets().list(arch);
+            String[] assetsFiles = assets.list(arch);
 
             File newf = new File(NRNBIN);
             FileOutputStream os = new FileOutputStream(newf);
-            for (int i=0; i<assetsFiles.length; i++) {
-                Log.v(TAG, "Found NEURON binary part: " + assetsFiles[i]);
-                InputStream is = getAssets().open(arch + "/" + assetsFiles[i]);
+            for (String assetsFile : assetsFiles) {
+                Log.v(TAG, "Found NEURON binary part: " + assetsFile);
+                InputStream is = assets.open(arch + "/" + assetsFile);
 
                 byte[] buffer = new byte[is.available()]; 
 

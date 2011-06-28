@@ -29,6 +29,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.DialogInterface;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
@@ -609,7 +610,17 @@ public class Term extends Activity {
     }
 
     private void doPreferences() {
-        startActivity(new Intent(this, TermPreferences.class));
+        AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+        dialog.setTitle("Preferences disabled");
+        dialog.setMessage("For compatibility reasons, preferences are " +
+                          "disabled in the builtin terminal");
+        dialog.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int whichButton) {
+                    /* Return silently */
+                }
+            });
+        dialog.show();
+        /* startActivity(new Intent(this, TermPreferences.class)); */
     }
 
     private void setColors() {

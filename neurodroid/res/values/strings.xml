@@ -133,4 +133,7 @@
 
     <!-- Colours -->
     <color name="gray">#ffff0000</color>
+    <color name="white">#ffffffff</color>
+    <color name="black">#00000000</color>
+
 </resources>

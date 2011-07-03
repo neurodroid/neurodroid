@@ -57,6 +57,7 @@ import android.net.Uri;
 
 import android.text.SpannableString;
 import android.text.util.Linkify;
+import android.text.method.ScrollingMovementMethod;
 
 import android.graphics.drawable.Drawable;
 
@@ -645,6 +646,7 @@ public class NeuroDroid extends Activity
             final SpannableString s = new SpannableString(aboutText);
 
             message.setPadding(5, 5, 5, 5);
+            message.setMovementMethod(new ScrollingMovementMethod());
             message.setText(s);
             Linkify.addLinks(message, Linkify.ALL);
 

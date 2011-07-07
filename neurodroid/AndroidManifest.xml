@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest 
     xmlns:android="http://schemas.android.com/apk/res/android" package="csh.neurodroid"
-    android:versionCode="09"
-    android:versionName="0.6.3">
+    android:versionCode="10"
+    android:versionName="0.6.4">
   <uses-sdk android:minSdkVersion="8" />
 
   <application
@@ -13,6 +13,7 @@
     <activity 
         android:name="NeuroDroid"
         android:label="@string/app_name"
+        android:configChanges="orientation|keyboardHidden"
         android:launchMode="singleTop">
       <intent-filter>
         <action android:name="android.intent.action.MAIN" />
@@ -35,6 +36,7 @@
     <activity 
         android:name="Squid"
         android:label="@string/squid_name"
+        android:configChanges="orientation|keyboardHidden"
         android:launchMode="singleTop">
     </activity>
 

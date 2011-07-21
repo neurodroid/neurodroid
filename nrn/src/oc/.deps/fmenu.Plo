@@ -1,3 +1,0 @@
-fmenu.lo: ../.././nrn-hg/src/oc/fmenu.c ../../src/nrnoc/../../nrnconf.h
-
-../../src/nrnoc/../../nrnconf.h:

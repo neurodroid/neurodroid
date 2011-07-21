@@ -1,4 +1,0 @@
-poisson.lo: ../.././nrn-hg/src/scopmath/poisson.c \
- ../../src/nrnoc/../../nrnconf.h
-
-../../src/nrnoc/../../nrnconf.h:

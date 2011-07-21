@@ -1,4 +1,0 @@
-modlreg.o: ../.././nrn-hg/src/oc/modlreg.c \
- ../../src/nrnoc/../../nrnconf.h
-
-../../src/nrnoc/../../nrnconf.h:

@@ -1,9 +1,0 @@
-nrntimeout.lo: ../.././nrn-hg/src/nrnoc/nrntimeout.c \
- ../../src/oc/../../nrnconf.h ../.././nrn-hg/src/oc/nrnmpi.h \
- ../../src/oc/nrnmpiuse.h
-
-../../src/oc/../../nrnconf.h:
-
-../.././nrn-hg/src/oc/nrnmpi.h:
-
-../../src/oc/nrnmpiuse.h:

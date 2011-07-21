@@ -1,4 +1,0 @@
-exprand.lo: ../.././nrn-hg/src/scopmath/exprand.c \
- ../../src/nrnoc/../../nrnconf.h
-
-../../src/nrnoc/../../nrnconf.h:

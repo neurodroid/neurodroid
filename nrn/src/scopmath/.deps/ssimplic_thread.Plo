@@ -1,6 +1,0 @@
-ssimplic_thread.lo: ../.././nrn-hg/src/scopmath/ssimplic_thread.c \
- ../../src/nrnoc/../../nrnconf.h ../.././nrn-hg/src/scopmath/errcodes.h
-
-../../src/nrnoc/../../nrnconf.h:
-
-../.././nrn-hg/src/scopmath/errcodes.h:

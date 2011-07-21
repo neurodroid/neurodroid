@@ -1,3 +1,0 @@
-version.o: ../.././nrn-hg/src/nmodl/version.c ../../nmodlconf.h
-
-../../nmodlconf.h:

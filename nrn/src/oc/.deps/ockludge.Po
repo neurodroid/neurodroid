@@ -1,9 +1,0 @@
-ockludge.o: ../.././nrn-hg/src/oc/ockludge.c \
- ../../src/nrnoc/../../nrnconf.h ../.././nrn-hg/src/oc/nrnmpi.h \
- nrnmpiuse.h
-
-../../src/nrnoc/../../nrnconf.h:
-
-../.././nrn-hg/src/oc/nrnmpi.h:
-
-nrnmpiuse.h:

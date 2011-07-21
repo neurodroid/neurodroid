@@ -1,4 +1,0 @@
-legendre.lo: ../.././nrn-hg/src/scopmath/legendre.c \
- ../../src/nrnoc/../../nrnconf.h
-
-../../src/nrnoc/../../nrnconf.h:

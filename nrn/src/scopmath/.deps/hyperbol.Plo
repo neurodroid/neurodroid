@@ -1,4 +1,0 @@
-hyperbol.lo: ../.././nrn-hg/src/scopmath/hyperbol.c \
- ../../src/nrnoc/../../nrnconf.h
-
-../../src/nrnoc/../../nrnconf.h:

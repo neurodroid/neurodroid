@@ -1,4 +1,0 @@
-boundary.lo: ../.././nrn-hg/src/scopmath/boundary.c \
- ../../src/nrnoc/../../nrnconf.h
-
-../../src/nrnoc/../../nrnconf.h:

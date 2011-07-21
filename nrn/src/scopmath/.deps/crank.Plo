@@ -1,4 +1,0 @@
-crank.lo: ../.././nrn-hg/src/scopmath/crank.c \
- ../../src/nrnoc/../../nrnconf.h
-
-../../src/nrnoc/../../nrnconf.h:

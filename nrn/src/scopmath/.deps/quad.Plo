@@ -1,4 +1,0 @@
-quad.lo: ../.././nrn-hg/src/scopmath/quad.c \
- ../../src/nrnoc/../../nrnconf.h
-
-../../src/nrnoc/../../nrnconf.h:

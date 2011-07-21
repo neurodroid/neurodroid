@@ -1,4 +1,0 @@
-perpulse.lo: ../.././nrn-hg/src/scopmath/perpulse.c \
- ../../src/nrnoc/../../nrnconf.h
-
-../../src/nrnoc/../../nrnconf.h:

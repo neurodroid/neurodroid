@@ -1,4 +1,0 @@
-squarewa.lo: ../.././nrn-hg/src/scopmath/squarewa.c \
- ../../src/nrnoc/../../nrnconf.h
-
-../../src/nrnoc/../../nrnconf.h:

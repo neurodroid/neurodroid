@@ -1,4 +1,0 @@
-gauss.lo: ../.././nrn-hg/src/scopmath/gauss.c \
- ../../src/nrnoc/../../nrnconf.h
-
-../../src/nrnoc/../../nrnconf.h:

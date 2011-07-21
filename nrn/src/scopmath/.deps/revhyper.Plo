@@ -1,4 +1,0 @@
-revhyper.lo: ../.././nrn-hg/src/scopmath/revhyper.c \
- ../../src/nrnoc/../../nrnconf.h
-
-../../src/nrnoc/../../nrnconf.h:

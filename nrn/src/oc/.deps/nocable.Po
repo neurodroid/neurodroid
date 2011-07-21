@@ -1,8 +1,0 @@
-nocable.o: ../.././nrn-hg/src/oc/nocable.c \
- ../../src/nrnoc/../../nrnconf.h nrnrtuse.h nrnmpiuse.h
-
-../../src/nrnoc/../../nrnconf.h:
-
-nrnrtuse.h:
-
-nrnmpiuse.h:

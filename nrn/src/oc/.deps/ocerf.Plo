@@ -1,0 +1,24 @@
+ocerf.lo: ../.././nrn-hg/src/oc/ocerf.c ../../src/nrnoc/../../nrnconf.h \
+ /home/cs/android-ndk-r6/platforms/android-8/arch-arm/usr/include/errno.h \
+ /home/cs/android-ndk-r6/platforms/android-8/arch-arm/usr/include/sys/cdefs.h \
+ /home/cs/android-ndk-r6/platforms/android-8/arch-arm/usr/include/sys/cdefs_elf.h \
+ /home/cs/android-ndk-r6/platforms/android-8/arch-arm/usr/include/linux/errno.h \
+ /home/cs/android-ndk-r6/platforms/android-8/arch-arm/usr/include/asm/errno.h \
+ /home/cs/android-ndk-r6/platforms/android-8/arch-arm/usr/include/asm-generic/errno.h \
+ /home/cs/android-ndk-r6/platforms/android-8/arch-arm/usr/include/asm-generic/errno-base.h
+
+../../src/nrnoc/../../nrnconf.h:
+
+/home/cs/android-ndk-r6/platforms/android-8/arch-arm/usr/include/errno.h:
+
+/home/cs/android-ndk-r6/platforms/android-8/arch-arm/usr/include/sys/cdefs.h:
+
+/home/cs/android-ndk-r6/platforms/android-8/arch-arm/usr/include/sys/cdefs_elf.h:
+
+/home/cs/android-ndk-r6/platforms/android-8/arch-arm/usr/include/linux/errno.h:
+
+/home/cs/android-ndk-r6/platforms/android-8/arch-arm/usr/include/asm/errno.h:
+
+/home/cs/android-ndk-r6/platforms/android-8/arch-arm/usr/include/asm-generic/errno.h:
+
+/home/cs/android-ndk-r6/platforms/android-8/arch-arm/usr/include/asm-generic/errno-base.h:

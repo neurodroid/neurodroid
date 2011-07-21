@@ -1,0 +1,4 @@
+sigmoid.lo: ../.././nrn-hg/src/scopmath/sigmoid.c \
+ ../../src/nrnoc/../../nrnconf.h
+
+../../src/nrnoc/../../nrnconf.h:

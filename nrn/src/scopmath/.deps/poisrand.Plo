@@ -1,0 +1,4 @@
+poisrand.lo: ../.././nrn-hg/src/scopmath/poisrand.c \
+ ../../src/nrnoc/../../nrnconf.h
+
+../../src/nrnoc/../../nrnconf.h:

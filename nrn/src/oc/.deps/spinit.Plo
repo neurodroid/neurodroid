@@ -1,0 +1,3 @@
+spinit.lo: ../.././nrn-hg/src/oc/spinit.c ../../src/nrnoc/../../nrnconf.h
+
+../../src/nrnoc/../../nrnconf.h:

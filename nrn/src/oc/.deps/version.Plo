@@ -1,0 +1,4 @@
+version.lo: ../.././nrn-hg/src/oc/version.c \
+ ../../src/nrnoc/../../nrnconf.h
+
+../../src/nrnoc/../../nrnconf.h:

@@ -1,0 +1,4 @@
+ramp.lo: ../.././nrn-hg/src/scopmath/ramp.c \
+ ../../src/nrnoc/../../nrnconf.h
+
+../../src/nrnoc/../../nrnconf.h:

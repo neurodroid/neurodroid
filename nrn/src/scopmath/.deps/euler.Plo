@@ -1,0 +1,6 @@
+euler.lo: ../.././nrn-hg/src/scopmath/euler.c \
+ ../../src/nrnoc/../../nrnconf.h ../.././nrn-hg/src/scopmath/errcodes.h
+
+../../src/nrnoc/../../nrnconf.h:
+
+../.././nrn-hg/src/scopmath/errcodes.h:

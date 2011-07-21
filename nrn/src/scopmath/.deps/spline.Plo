@@ -1,0 +1,4 @@
+spline.lo: ../.././nrn-hg/src/scopmath/spline.c \
+ ../../src/nrnoc/../../nrnconf.h
+
+../../src/nrnoc/../../nrnconf.h:

@@ -1,0 +1,4 @@
+step.lo: ../.././nrn-hg/src/scopmath/step.c \
+ ../../src/nrnoc/../../nrnconf.h
+
+../../src/nrnoc/../../nrnconf.h:

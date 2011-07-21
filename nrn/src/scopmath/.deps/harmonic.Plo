@@ -1,0 +1,4 @@
+harmonic.lo: ../.././nrn-hg/src/scopmath/harmonic.c \
+ ../../src/nrnoc/../../nrnconf.h
+
+../../src/nrnoc/../../nrnconf.h:

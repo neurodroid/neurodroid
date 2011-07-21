@@ -1,0 +1,6 @@
+runge.lo: ../.././nrn-hg/src/scopmath/runge.c \
+ ../../src/nrnoc/../../nrnconf.h ../.././nrn-hg/src/scopmath/errcodes.h
+
+../../src/nrnoc/../../nrnconf.h:
+
+../.././nrn-hg/src/scopmath/errcodes.h:

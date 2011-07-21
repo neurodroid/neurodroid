@@ -1,0 +1,6 @@
+ssimplic.lo: ../.././nrn-hg/src/scopmath/ssimplic.c \
+ ../../src/nrnoc/../../nrnconf.h ../.././nrn-hg/src/scopmath/errcodes.h
+
+../../src/nrnoc/../../nrnconf.h:
+
+../.././nrn-hg/src/scopmath/errcodes.h:

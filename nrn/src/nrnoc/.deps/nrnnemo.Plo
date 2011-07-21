@@ -1,0 +1,4 @@
+nrnnemo.lo: ../.././nrn-hg/src/nrnoc/nrnnemo.c \
+ ../../src/oc/../../nrnconf.h
+
+../../src/oc/../../nrnconf.h:

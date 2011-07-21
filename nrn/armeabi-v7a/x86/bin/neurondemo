@@ -1,0 +1,21 @@
+#!/bin/sh
+
+ARCH=x86
+if test "x${NRNHOME}" = x ; then
+        prefix="/home/cs/neurodroid/nrn/armeabi-v7a"
+	exec_prefix=/home/cs/neurodroid/nrn/armeabi-v7a/x86
+	NRNBIN=${exec_prefix}/bin/
+	NRNDEMO=/home/cs/neurodroid/nrn/armeabi-v7a/share/nrn/demo/
+else
+        prefix="$NRNHOME"
+	exec_prefix="${prefix}/${ARCH}"
+	NRNBIN="${exec_prefix}/bin/"
+	NRNDEMO="${prefix}/share/nrn/demo/"
+fi
+export NRNDEMO
+
+if [ ! -f "${NRNDEMO}neuron" ] ; then
+	(cd "${NRNDEMO}release" ; "${NRNBIN}nrnivmodl" ; cd .. ; ln -s release/${ARCH}/special neuron)
+fi
+
+"${NRNDEMO}neuron" "${NRNDEMO}demo.hoc" "$@" -

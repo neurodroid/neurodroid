@@ -1,0 +1,6 @@
+csoda.lo: ../.././nrn-hg/src/scopmath/csoda.c \
+ ../../src/nrnoc/../../nrnconf.h ../.././nrn-hg/src/scopmath/f2c.h
+
+../../src/nrnoc/../../nrnconf.h:
+
+../.././nrn-hg/src/scopmath/f2c.h:

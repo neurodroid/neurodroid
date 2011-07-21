@@ -1,5 +1,3 @@
-syntax: glob
-
 # binaries, backups
 
 *~
@@ -96,6 +94,3 @@ neurodroid/tests/bin/*
 .AppleDouble
 
 commit.sh
-
-syntax: regexp
-.*\#.*\#$

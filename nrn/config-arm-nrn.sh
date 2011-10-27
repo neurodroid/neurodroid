@@ -1,6 +1,6 @@
 #! /bin/bash
 
-NDKDIR=${HOME}/android-ndk-r6
+NDKDIR=${HOME}/android-ndk-r6b
 
 if test -n "$1"; then
     MYAGCC=agcc-vfp

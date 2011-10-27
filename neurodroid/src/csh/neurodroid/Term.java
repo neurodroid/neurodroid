@@ -62,7 +62,7 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.view.inputmethod.BaseInputConnection;
 import android.view.inputmethod.CompletionInfo;
-import android.view.inputmethod.CorrectionInfo;
+/* import android.view.inputmethod.CorrectionInfo; */
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.ExtractedText;
 import android.view.inputmethod.ExtractedTextRequest;
@@ -3144,12 +3144,14 @@ class EmulatorView extends View implements GestureDetector.OnGestureListener {
                 return true;
             }
 
+            /** API Level 11, we are currently at API level 10, so don't use this.
             public boolean commitCorrection (CorrectionInfo correctionInfo) {
                 if (Term.LOG_IME) {
                     Log.w(TAG, "commitCorrection");
                 }
                 return true;
             }
+            */
 
             public boolean commitText(CharSequence text, int newCursorPosition) {
                 if (Term.LOG_IME) {

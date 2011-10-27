@@ -9,11 +9,11 @@ cp -v ./src/nmodl/nocmodl ./armeabi/x86/bin/nocmodl
 cp -v ./src/nmodl/nocmodl ./armeabi-v7a/x86/bin/nocmodl
 
 ./config-arm-nrn.sh
-make -j8
+make -j12
 make install
 
 ./config-arm-nrn.sh 1
-make -j8
+make -j12
 make install
 
 ./cplibs-static.py

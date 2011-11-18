@@ -1,0 +1,13 @@
+NDKDIR=${HOME}/android-ndk-r7
+
+LIBSTDCXXDIR=${NDKDIR}/sources/cxx-stl/gnu-libstdc++
+LIBSTDCXXINC=${LIBSTDCXXDIR}/include
+LIBSTDCXXLIB="-L${LIBSTDCXXDIR}/libs/${ARCH} -lgnustl_static"
+
+TARGET=`pwd`/${ARCH}
+
+cccmd="agcc -O0 -c -o test_agcc.o -I${LIBSTDCXXINC} ${LIBSTDCXXLIB} test_agcc.cpp"
+echo ${cccmd}
+${cccmd}
+
+agcc -o test.out test_agcc.o 

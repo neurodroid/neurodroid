@@ -93,4 +93,6 @@ neurodroid/tests/bin/*
 .DS_Store
 .AppleDouble
 
+.classpath
+
 commit.sh

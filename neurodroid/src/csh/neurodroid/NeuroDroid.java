@@ -304,7 +304,7 @@ public class NeuroDroid extends Activity
 
     private void launchTerm() {
         SharedPreferences prefs = getBaseContext().getSharedPreferences("csh.neurodroid_preferences", 0);
-        boolean useBuiltin = prefs.getBoolean("cb_builtin", false);
+        boolean useBuiltin = prefs.getBoolean("cb_builtin", true);
         Intent builtinTerm = new Intent(getBaseContext(), Term.class); 
         if (useBuiltin) {
             runTerm(builtinTerm);

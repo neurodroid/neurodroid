@@ -77,6 +77,8 @@ public class Preferences extends PreferenceActivity {
                 }});
         
         chkEnableBuiltin = (CheckBoxPreference)getPreferenceScreen().findPreference("cb_builtin");
+        /* Initialise builtin terminal status */
+        chkEnableBuiltin.setChecked(prevBuiltin);
         chkEnableBuiltin.setOnPreferenceClickListener(new OnPreferenceClickListener() {
                 public boolean onPreferenceClick(Preference preference) {
                     if (chkEnableBuiltin.isChecked()) {

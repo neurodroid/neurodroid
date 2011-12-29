@@ -39,7 +39,7 @@ my $GCC = `which arm-linux-androideabi-gcc`;
 $GCC = qx(cd `dirname $GCC`; /bin/pwd);
 chomp $GCC;
 die "bad arm-linux-androideabi-gcc path" if $GCC !~ /(.*)\/prebuilt\//;
-my $HOME = "/home/cs";
+my $HOME = $ENV{"HOME"};
 my $DROID = "$HOME/android-cm/system"; #$1;
 my $TARGET = "android-8";
 my $NDK = "$HOME/android-ndk-r6b";

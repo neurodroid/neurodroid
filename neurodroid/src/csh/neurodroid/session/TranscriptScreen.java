@@ -19,7 +19,6 @@ package csh.neurodroid.session;
 import java.util.Arrays;
 
 import android.graphics.Canvas;
-import android.util.Log;
 
 import csh.neurodroid.model.Screen;
 import csh.neurodroid.model.TextRenderer;

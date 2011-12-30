@@ -44,11 +44,11 @@ public class UnZip {
     }
 
     /** Cache of paths we've mkdir()ed. */
-    protected SortedSet dirsMade;
+    protected SortedSet<String> dirsMade;
 
     /** For a given Zip file, process each entry. */
     public void unZip(String fileName, String baseDir) {
-        dirsMade = new TreeSet();
+        dirsMade = new TreeSet<String>();
         try {
             zippy = new ZipFile(fileName);
             Enumeration all = zippy.entries();

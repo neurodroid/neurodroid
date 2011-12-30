@@ -6,10 +6,7 @@
 
 package csh.neurodroid;
 
-import java.io.*;
-import java.util.Scanner;
 import java.util.ArrayList;
-import java.util.concurrent.CountDownLatch;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
@@ -23,7 +20,6 @@ import android.view.View.OnClickListener;
 
 import android.content.Intent;
 
-import android.util.Log;
 
 public class Squid extends Activity {
 

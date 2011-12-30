@@ -8,35 +8,25 @@ package csh.neurodroid;
 
 import java.io.*;
 
-import java.util.Enumeration;
 import java.util.Scanner;
-import java.util.Map;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Arrays;
 import java.util.ArrayList;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.app.Instrumentation;
 
 import android.widget.TextView;
 import android.widget.Button;
 import android.widget.Toast;
-import android.widget.CheckBox;
 
 import android.os.Bundle;
-import android.os.Environment;
 
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MenuInflater;
 import android.view.View.OnClickListener;
-import android.view.Gravity;
-import android.view.LayoutInflater;
 
 import android.util.Log;
 
@@ -46,12 +36,8 @@ import android.content.SharedPreferences;
 import android.content.Context;
 import android.content.ComponentName;
 import android.content.ActivityNotFoundException;
-import android.content.res.Resources;
-import android.content.res.AssetManager;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageInfo;
-
-import android.preference.PreferenceManager;
 
 import android.net.Uri;
 
@@ -79,11 +65,7 @@ public class NeuroDroid extends Activity
     private ProgressDialog pd;
     private TextView tv;
     private boolean supportsVfp;
-    private CheckBox chkEnableVfp;
-    
     private String nrnoutput="", nrnversion, curHocFile;
-
-    private Resources resources;
 
     /** Called when the activity is first created. */
     @Override public void onCreate(Bundle savedInstanceState) {
@@ -91,7 +73,7 @@ public class NeuroDroid extends Activity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
 
-        resources = getResources();
+        getResources();
         
         /* Create directories */
         File cacheDir = new File(CACHEDIR);
@@ -347,7 +329,6 @@ public class NeuroDroid extends Activity
         ComponentName termComp = new ComponentName("jackpal.androidterm", "jackpal.androidterm.Term");
         try {
             PackageInfo pinfo = context.getPackageManager().getPackageInfo(termComp.getPackageName(), 0);
-            String patchVersion = pinfo.versionName;
             int patchCode = pinfo.versionCode;
 
             if (patchCode < 32) {
@@ -364,7 +345,7 @@ public class NeuroDroid extends Activity
         /* Read cpu info */
         FileInputStream fis = new FileInputStream("/proc/cpuinfo");
         Scanner scanner = new Scanner(fis);
-        String NL = System.getProperty("line.separator");
+        System.getProperty("line.separator");
 
         boolean vfp = false;
         try {
@@ -400,7 +381,6 @@ public class NeuroDroid extends Activity
     /** Copy an assets file to the cache directory */
     public void saveAssetsFile(String src, String target) {
 
-        String newfn;
         try {
             InputStream is = getAssets().open(src);
 
@@ -630,7 +610,7 @@ public class NeuroDroid extends Activity
         }
 
         String[] chmodlist = {getChmod(), "755", NRNBIN};
-        String chmodout = runBinary(chmodlist, NRNHOME);
+        runBinary(chmodlist, NRNHOME);
     }
 
     private static class AboutDialogBuilder {

@@ -1473,9 +1473,9 @@ public class TerminalEmulator {
         }
     }
 
-    private void emit(char[] c, int offset, int length) {
+    /* private void emit(char[] c, int offset, int length) {
         emit(c, offset, length, getForeColor(), getBackColor());
-    }
+    } */
 
     private void setCursorRow(int row) {
         mCursorRow = row;

@@ -22,11 +22,9 @@ import android.os.IBinder;
 import android.content.Intent;
 import android.util.Log;
 import android.app.Notification;
-import android.app.NotificationManager;
 import android.app.PendingIntent;
 
 import csh.neurodroid.model.SessionFinishCallback;
-import csh.neurodroid.model.UpdateCallback;
 import csh.neurodroid.session.TermSession;
 import csh.neurodroid.util.ServiceForegroundCompat;
 import csh.neurodroid.util.SessionList;

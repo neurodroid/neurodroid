@@ -8,18 +8,12 @@ package csh.neurodroid;
 
 import java.io.IOException;
 
-import android.app.Activity;
-
 import android.content.SharedPreferences;
 
 import android.os.Bundle;
 
-import android.view.View;
-import android.view.View.OnClickListener;
-
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
-import android.preference.PreferenceManager;
 import android.preference.CheckBoxPreference;
 import android.preference.Preference.OnPreferenceClickListener;
 

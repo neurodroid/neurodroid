@@ -51,7 +51,7 @@ public class UnZip {
         dirsMade = new TreeSet<String>();
         try {
             zippy = new ZipFile(fileName);
-            Enumeration all = zippy.entries();
+            Enumeration<? extends ZipEntry> all = zippy.entries();
             while (all.hasMoreElements()) {
                 getFile((ZipEntry)all.nextElement(), baseDir);
             }
@@ -119,7 +119,7 @@ public class UnZip {
              /* chmod to rwr-r- */
              chmodlist.set(2, zipName);
              ProcessBuilder pb = new ProcessBuilder(chmodlist);
-             Process process = pb.start();
+             /* Process process = */ pb.start();
 
              break;
          case LIST:

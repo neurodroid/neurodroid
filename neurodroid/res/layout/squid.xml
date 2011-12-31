@@ -1,35 +1,99 @@
 <?xml version="1.0" encoding="utf-8"?>
-<TableLayout 
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
+<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
-    android:stretchColumns="*">
+    android:orientation="vertical"
+    android:stretchColumns="*" >
 
-  <TableRow>
+    <TableRow>
 
-    <Button
-        android:id="@+id/btnSquidRun" 
-        android:text="Run" 
-        android:layout_width="fill_parent" 
-        android:layout_height="wrap_content" 
-        android:typeface="normal">
-    </Button>
+        <Button
+            android:id="@+id/btnSquidRun"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/squid_run"
+            android:typeface="normal" >
+        </Button>
 
-    <Button
-        android:id="@+id/btnSquidBack" 
-        android:text="Back" 
-        android:layout_width="fill_parent" 
-        android:layout_height="wrap_content" 
-        android:typeface="normal">
-    </Button>
+        <Button
+            android:id="@+id/btnSquidBack"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/squid_back"
+            android:typeface="normal" >
+        </Button>
+    </TableRow>
 
-  </TableRow>
+    <LinearLayout>
 
-  <csh.neurodroid.GraphView
-      android:id="@+id/vwGraphView" 
-      android:layout_width="fill_parent" 
-      android:layout_height="wrap_content" 
-      android:typeface="normal" />
+        <TextView
+            android:id="@+id/textViewGna"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/squid_gna"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+ 
+    </LinearLayout>
+
+    <LinearLayout>
+
+        <SeekBar
+            android:id="@+id/sbarSquidGna"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:max="100"
+            android:progress="50"
+            android:secondaryProgress="50" />
+        
+    </LinearLayout>
+
+    <LinearLayout>
+
+        <TextView
+            android:id="@+id/tvSquidGnaProgress"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content" >
+        </TextView>
+
+    </LinearLayout>
+
+    <LinearLayout>
+
+        <TextView
+            android:id="@+id/textViewGk"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/squid_gk"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+ 
+    </LinearLayout>
+
+    <LinearLayout>
+
+        <SeekBar
+            android:id="@+id/sbarSquidGk"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:max="100"
+            android:progress="50"
+            android:secondaryProgress="50" />
+        
+    </LinearLayout>
+
+    <LinearLayout>
+
+        <TextView
+            android:id="@+id/tvSquidGkProgress"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content" >
+        </TextView>
+
+    </LinearLayout>
+
+    <csh.neurodroid.GraphView
+        android:id="@+id/vwSquidGraphView"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:typeface="normal" />
 
 </TableLayout>

@@ -12,6 +12,9 @@ create axon
 access axon
 insert hh
 
+gnabar_hh = gna
+gkbar_hh = gk
+
 objref ic
 ic = new IClamp(0)
 ic.dur = 0.5 /* ms */

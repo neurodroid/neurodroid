@@ -155,9 +155,17 @@
    <string name="pref_termtype_default">screen</string>
    <bool name="pref_close_window_on_process_exit_default">true</bool>
 
-    <!-- Misc -->
+    <!-- Squid -->
     <string name="squid_name">Squid Action Potential</string>
-    <string name="wait_msg">Please wait...</string>
+    <string name="squid_run">Run</string>
+    <string name="squid_back">Back</string>
+    <string name="squid_gna">Sodium conductance density</string>
+    <string name="squid_gk">Potassium conductance density</string>
+    <string name="seekbar_from_touch">from touch</string>
+    <string name="squid_msg">Running squid AP simulation&#8230;</string>
+
+    <!-- Misc -->
+    <string name="wait_msg">Please wait&#8230;</string>
 
     <!-- Colours -->
     <color name="gray">#ffff0000</color>

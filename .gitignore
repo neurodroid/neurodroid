@@ -94,5 +94,5 @@ neurodroid/tests/bin/*
 .AppleDouble
 
 .classpath
-
+local.properties
 commit.sh

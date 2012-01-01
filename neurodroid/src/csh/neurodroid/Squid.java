@@ -129,14 +129,20 @@ public class Squid extends Activity {
                         Log.e(NeuroDroid.TAG, CACHEDIR + "/squid*.hoc");
                     }
                     String[] cmdlist = {NRNBIN, RUNHOC};
+                    // long time0 = System.currentTimeMillis();
                     final String squidOut = NeuroDroid.runBinary(cmdlist, NRNHOME, false);
+                    // Log.v(NeuroDroid.TAG, String.format("Run neuron: %d ms", System.currentTimeMillis()-time0));
                     runOnUiThread(new Runnable(){
                             @Override public void run() {
                                 if (pd.isShowing()) {
                                     pd.dismiss();
                                 }
+                                // long time0 = System.currentTimeMillis();
                                 ArrayList<Float> values = NeuroDroid.parseNrnOut(squidOut);
+                                // Log.v(NeuroDroid.TAG, String.format("Parse neuron output: %d ms", System.currentTimeMillis()-time0));
+                                // time0 = System.currentTimeMillis();
                                 showGraph(values);
+                                // Log.v(NeuroDroid.TAG, String.format("Show graph: %d ms", System.currentTimeMillis()-time0));
                             }
                         });
                 }
@@ -146,8 +152,7 @@ public class Squid extends Activity {
     }
 
     private void showGraph(ArrayList<Float> graphArray) {
-        Intent graphActivity = new Intent(getBaseContext(),
-                                          Graph.class);
+        Intent graphActivity = new Intent(getBaseContext(), Graph.class);
         graphActivity.putExtra("csh.neurodroid.graphtitle", getString(R.string.squid_name));
         graphActivity.putExtra("csh.neurodroid.grapharray", graphArray);
         /* Read default AP from file */
@@ -156,9 +161,11 @@ public class Squid extends Activity {
             ArrayList<Float> stdArray = new ArrayList<Float>();
             try {
                 while (outscanner.hasNextLine()) {
+                    stdArray.add(new Float(outscanner.next()));
+                    /* nextFloat is safer but prohibitively slow
                     if (outscanner.hasNextFloat()) {
                         stdArray.add(outscanner.nextFloat());
-                    }
+                    } */
                     outscanner.nextLine();
                 }
             } finally {

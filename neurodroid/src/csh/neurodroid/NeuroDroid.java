@@ -462,18 +462,25 @@ public class NeuroDroid extends Activity
 
     public static ArrayList<Float> parseNrnOut(String nrnOut) {
         Scanner outscanner = new Scanner(nrnOut);
-        ArrayList<Float> flArray = new ArrayList<Float>();
-        flArray.add(1.0f); /* dt */
+        int len = nrnOut.split("ND").length;
+        ArrayList<Float> flArray = new ArrayList<Float>(len+1);
+        
+        flArray.add(1.0f); // dt
+        
         try {
             while (outscanner.hasNextLine()) {
                 if (outscanner.findInLine("ND") != null) {
                     if (outscanner.findInLine("dt") != null) {
-                        if (outscanner.hasNextFloat()) {
+                        flArray.set(0, new Float(outscanner.next()));
+                        /* nextFloat is safer but prohibitively slow
+                         * if (outscanner.hasNextFloat()) {
                             flArray.set(0, outscanner.nextFloat());
-                        }
-                    }
-                    if (outscanner.hasNextFloat()) {
-                        flArray.add(outscanner.nextFloat());
+                        } */
+                    } else {
+                        flArray.add(new Float(outscanner.next()));
+                        /* if (outscanner.hasNextFloat()) {                        
+                            flArray.add(outscanner.nextFloat());
+                        }*/
                     }
                 }
                 outscanner.nextLine();

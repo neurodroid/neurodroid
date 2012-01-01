@@ -168,6 +168,9 @@
     <!-- Graph -->
     <string name="graph_name">Graph</string>
     
+    <!-- GLGraph -->
+    <string name="glgraph_name">Graph</string>
+    
     <!-- Misc -->
     <string name="wait_msg">Please wait&#8230;</string>
 

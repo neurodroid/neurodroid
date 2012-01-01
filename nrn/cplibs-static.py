@@ -31,6 +31,7 @@ for arch in archs:
 
 cpfile("benchmark.hoc", "../neurodroid/assets/benchmark.hoc")
 cpfile("squid.hoc", "../neurodroid/assets/squid.hoc")
+cpfile("squid_std.txt", "../neurodroid/assets/squid_std.txt")
 
 # Seemingly there's nothing architecture-dependent in the library so that we only need to do this once:
 p = subprocess.Popen("/usr/bin/zip -r lib.zip *", cwd="./armeabi/share/nrn", shell=True)

@@ -26,6 +26,7 @@ public class GraphView extends View {
 
     private Paint paint;
     private ArrayList<Float> values;
+    private ArrayList<Float> stdvalues;
     private String[] xlabels;
     private String[] ylabels;
     private String title;
@@ -44,6 +45,7 @@ public class GraphView extends View {
 
     public void initGraphView() {
         values = new ArrayList<Float> ();
+        stdvalues = new ArrayList<Float> ();
         title = "";
         xtitle = "Time (ms)";
         ytitle = "V (mv)";
@@ -53,12 +55,13 @@ public class GraphView extends View {
         paint = new Paint();
     }
     
-    public void setGraph(ArrayList<Float> values, String title) {
-        setGraph(values, title, null, null, LINE);
+    public void setGraph(ArrayList<Float> values, ArrayList<Float> stdvalues, String title) {
+        setGraph(values, stdvalues, title, null, null, LINE);
     }
 
-    public void setGraph(ArrayList<Float> values, String title, String[] xlabels, String[] ylabels, boolean type) {
+    public void setGraph(ArrayList<Float> values, ArrayList<Float> stdvalues, String title, String[] xlabels, String[] ylabels, boolean type) {
         this.values = values;
+        this.stdvalues = stdvalues;
         
         if (title == null)
             title = "";
@@ -161,7 +164,7 @@ public class GraphView extends View {
         canvas.drawText(xtitle, (graphwidth / 2) + horstart, height - 4, paint);
 
         if (max != min) {
-            paint.setColor(Color.LTGRAY);
+            paint.setColor(Color.WHITE);
             if (type == BAR) {
                 float datalength = values.size();
                 float colwidth = (width - (2 * horborder)) / datalength;
@@ -172,11 +175,26 @@ public class GraphView extends View {
                     canvas.drawRect((i * colwidth) + horstart, (verborder - h) + graphheight, ((i * colwidth) + horstart) + (colwidth - 1), height - (verborder - 1), paint);
                 }
             } else {
-                float datalength = values.size();
+                paint.setStrokeWidth(2.0f);
+                paint.setColor(Color.DKGRAY);
+                float datalength = stdvalues.size();
                 float colwidth = (width - (2 * horborder)) / datalength;
                 float halfcol = colwidth / 2;
                 float lasth = 0;
+                for (int i = 0; i < stdvalues.size(); i++) {
+                    float val = stdvalues.get(i) - min;
+                    float rat = val / diff;
+                    float h = graphheight * rat;
+                    if (i > 0)
+                        canvas.drawLine(((i - 1) * colwidth) + (horstart + 1) + halfcol, (verborder - lasth) + graphheight, (i * colwidth) + (horstart + 1) + halfcol, (verborder - h) + graphheight, paint);
+                    lasth = h;
+                }
                 paint.setStrokeWidth(2.0f);
+                paint.setColor(Color.WHITE);
+                datalength = values.size();
+                colwidth = (width - (2 * horborder)) / datalength;
+                halfcol = colwidth / 2;
+                lasth = 0;
                 for (int i = 0; i < values.size(); i++) {
                     float val = values.get(i) - min;
                     float rat = val / diff;
@@ -185,6 +203,8 @@ public class GraphView extends View {
                         canvas.drawLine(((i - 1) * colwidth) + (horstart + 1) + halfcol, (verborder - lasth) + graphheight, (i * colwidth) + (horstart + 1) + halfcol, (verborder - h) + graphheight, paint);
                     lasth = h;
                 }
+                paint.setColor(Color.LTGRAY);
+                paint.setStrokeWidth(2.0f);
             }
         }
 

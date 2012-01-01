@@ -1,10 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest 
     xmlns:android="http://schemas.android.com/apk/res/android" package="csh.neurodroid"
-    android:versionCode="11"
-    android:versionName="0.6.5">
+    android:versionCode="12"
+    android:versionName="0.7.0">
   <uses-sdk android:minSdkVersion="8" />
+  <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+  <uses-permission android:name="android.permission.WAKE_LOCK" />
+  
+  <uses-feature android:name="android.hardware.touchscreen" android:required="false" />
 
+  
   <application
       android:icon="@drawable/ic_launcher_neurodroid"
       android:label="@string/app_name">
@@ -41,24 +46,26 @@
     </activity>
 
     <activity 
-        android:name="Term"
-        android:theme="@style/TermTheme"
-        android:launchMode="singleTask"
-        android:configChanges="keyboard|keyboardHidden|orientation"
-        android:windowSoftInputMode="adjustResize|stateVisible">
+        android:name="Graph"
+        android:label="@string/graph_name"
+        android:configChanges="orientation|keyboardHidden"
+        android:launchMode="singleTop">
+    </activity>
+
+    <activity android:name="Term"
+              android:theme="@style/Theme"
+              android:launchMode="singleTask"
+              android:configChanges="keyboard|keyboardHidden|orientation"
+              android:windowSoftInputMode="adjustResize|stateAlwaysVisible">
       <intent-filter>
         <!-- action android:name="android.intent.action.MAIN" / -->
         <!-- category android:name="android.intent.category.LAUNCHER" / -->
       </intent-filter>
     </activity>
     <activity android:name="TermPreferences"/>
+    <activity android:name="WindowList"/>
     <service android:name="TermService" />
 
   </application>
-
-  <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-  <uses-permission android:name="android.permission.WAKE_LOCK" />
-  
-  <uses-feature android:name="android.hardware.touchscreen" android:required="false" />
 
 </manifest> 

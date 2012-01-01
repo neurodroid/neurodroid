@@ -6,9 +6,9 @@
 
 package csh.neurodroid;
 
-import android.app.Activity;
+import java.util.ArrayList;
 
-import android.content.Intent;
+import android.app.Activity;
 
 import android.os.Bundle;
 
@@ -24,7 +24,13 @@ public class Graph extends Activity {
         
         gv = (GraphView)findViewById(R.id.vwGraphView);
 
-        double[] array = getIntent().getDoubleArrayExtra("csh.neurodroid.grapharray");
+        String title = getIntent().getStringExtra("csh.neurodroid.graphtitle");
+        @SuppressWarnings("unchecked")
+        ArrayList<Float> array = (ArrayList<Float>)getIntent().getSerializableExtra("csh.neurodroid.grapharray");
+        @SuppressWarnings("unchecked")
+        ArrayList<Float> stdarray = (ArrayList<Float>)getIntent().getSerializableExtra("csh.neurodroid.stdarray");
+        gv.setGraph(array, stdarray, title);
+        gv.invalidate();
     }
 
 }

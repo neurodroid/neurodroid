@@ -8,10 +8,12 @@ package csh.neurodroid;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Scanner;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
@@ -20,9 +22,12 @@ import android.widget.Button;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
+import android.widget.TextView.BufferType;
 
 import android.os.Bundle;
 
+import android.text.Spannable;
+import android.text.style.SuperscriptSpan;
 import android.util.Log;
 
 import android.view.View;
@@ -33,13 +38,10 @@ import android.content.Intent;
 
 public class Squid extends Activity {
 
-    public GraphView gv;
-
     private String NRNBIN, NRNHOME, CACHEDIR, RAWHOC, RUNHOC;
     private ProgressDialog pd;
     private String nrnoutput;
     private double mGna, mGk;
-    
     TextView mProgressGnaText, mProgressGkText;
     
     /** Called when the activity is first created. */
@@ -56,8 +58,6 @@ public class Squid extends Activity {
 
         setContentView(R.layout.squid);
 
-        gv = (GraphView)findViewById(R.id.vwSquidGraphView);
-
         Button runButton = (Button)findViewById(R.id.btnSquidRun);
         runButton.setOnClickListener(new OnClickListener() {
                 @Override public void onClick(View v) {
@@ -65,18 +65,11 @@ public class Squid extends Activity {
                 }
             });
 
-        Button backButton = (Button)findViewById(R.id.btnSquidBack);
-        backButton.setOnClickListener(new OnClickListener() {
-                @Override public void onClick(View v) {
-                    finish();
-                }
-            });
-
         SeekBar gnaSeekBar = (SeekBar)findViewById(R.id.sbarSquidGna);
         gnaSeekBar.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromTouch) {
-                mProgressGnaText.setText(formatG(progressToGna(progress)));
+                formatG(mProgressGnaText, progressToGna(progress));
                 mGna = progressToGna(progress);
             }
 
@@ -91,13 +84,13 @@ public class Squid extends Activity {
         });
         mProgressGnaText = (TextView)findViewById(R.id.tvSquidGnaProgress);
         mGna = progressToGna(gnaSeekBar.getProgress());
-        mProgressGnaText.setText(formatG(mGna));
+        formatG(mProgressGnaText, mGna);
 
         SeekBar gkSeekBar = (SeekBar)findViewById(R.id.sbarSquidGk);
         gkSeekBar.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromTouch) {
-                mProgressGkText.setText(formatG(progressToGk(progress)));
+                formatG(mProgressGkText, progressToGk(progress));
                 mGk = progressToGk(progress);
             }
 
@@ -112,8 +105,8 @@ public class Squid extends Activity {
         });
         mProgressGkText = (TextView)findViewById(R.id.tvSquidGkProgress);
         mGk = progressToGk(gkSeekBar.getProgress());
-        mProgressGkText.setText(formatG(mGk));
-}
+        formatG(mProgressGkText, mGk);
+    }
 
     public String runSquid() {
         pd = ProgressDialog.show(this,
@@ -128,7 +121,7 @@ public class Squid extends Activity {
                         out.write(initString);
                         int c;
                         while ((c = in.read()) != -1)
-                          out.write(c);
+                            out.write(c);
 
                         in.close();
                         out.close();
@@ -143,8 +136,7 @@ public class Squid extends Activity {
                                     pd.dismiss();
                                 }
                                 ArrayList<Float> values = NeuroDroid.parseNrnOut(squidOut);
-                                gv.setGraph(values, "Squid Action Potential");
-                                gv.invalidate();
+                                showGraph(values);
                             }
                         });
                 }
@@ -152,7 +144,34 @@ public class Squid extends Activity {
             
         return nrnoutput;
     }
-    
+
+    private void showGraph(ArrayList<Float> graphArray) {
+        Intent graphActivity = new Intent(getBaseContext(),
+                                          Graph.class);
+        graphActivity.putExtra("csh.neurodroid.graphtitle", getString(R.string.squid_name));
+        graphActivity.putExtra("csh.neurodroid.grapharray", graphArray);
+        /* Read default AP from file */
+        try {
+            Scanner outscanner = new Scanner(new File(CACHEDIR + "/squid_std.txt"));
+            ArrayList<Float> stdArray = new ArrayList<Float>();
+            try {
+                while (outscanner.hasNextLine()) {
+                    if (outscanner.hasNextFloat()) {
+                        stdArray.add(outscanner.nextFloat());
+                    }
+                    outscanner.nextLine();
+                }
+            } finally {
+                outscanner.close();
+            }
+            graphActivity.putExtra("csh.neurodroid.stdarray", stdArray);
+        } catch (IOException e) {
+            Log.e(NeuroDroid.TAG, CACHEDIR + "/squid_std.txt");
+        }
+
+        startActivity(graphActivity);
+    }
+
     private double progressToGna(int progress) {
     	return progress * 1.80 + 30.0;
     }
@@ -161,7 +180,9 @@ public class Squid extends Activity {
         return progress * 0.36 + 18.0;
     }
     
-    private String formatG(double g) {
-        return String.format("%.1f", g) + " mS / cm^2";       
+    private void formatG(TextView tv, double g) {
+        tv.setText(String.format("%.1f ", g) + getString(R.string.squid_gunits), BufferType.SPANNABLE);
+        Spannable str = (Spannable)tv.getText();
+        str.setSpan(new SuperscriptSpan(), str.length()-1, str.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
     }
 }

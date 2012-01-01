@@ -58,7 +58,7 @@ public class NeuroDroid extends Activity
     public static final int TERM_UNAVAILABLE=0, TERM_OUTDATED=1, TERM_AVAILABLE=2;
     public String fHoc;
     
-    private static final String[] HOC_ASSETS = {"benchmark.hoc", "squid.hoc"};
+    private static final String[] HOC_ASSETS = {"benchmark.hoc", "squid.hoc", "squid_std.txt"};
     private static final int REQUEST_SAVE=0, REQUEST_LOAD=1, REQUEST_PREFS=2,
         REQUEST_SQUID_BACK=3;
     private static final int DIALOG_MARKETNOTFOUND=0, DIALOG_TERM_UNAVAILABLE=1;

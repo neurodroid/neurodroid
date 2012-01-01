@@ -6,18 +6,28 @@
     android:layout_height="wrap_content"
     android:stretchColumns="*">
 
+  <TableRow>
     <Button
-        android:id="@+id/btnTerm" 
-        android:text="@string/start_terminal" 
+        android:id="@+id/btnSquid" 
+        android:text="@string/squid_ap_sim" 
         android:layout_width="fill_parent" 
         android:layout_height="wrap_content" 
         android:typeface="normal">
     </Button>
-
-  <TableRow>
+      
     <Button
         android:id="@+id/btnLoadFile" 
         android:text="@string/load_hoc" 
+        android:layout_width="fill_parent" 
+        android:layout_height="wrap_content" 
+        android:typeface="normal">
+    </Button>
+  </TableRow>
+
+  <TableRow>
+    <Button
+        android:id="@+id/btnBenchmark" 
+        android:text="@string/run_benchmark" 
         android:layout_width="fill_parent" 
         android:layout_height="wrap_content" 
         android:typeface="normal">
@@ -32,26 +42,16 @@
     </Button>
 
   </TableRow>
-
-  <TableRow>
-    <Button
-        android:id="@+id/btnBenchmark" 
-        android:text="@string/run_benchmark" 
-        android:layout_width="fill_parent" 
-        android:layout_height="wrap_content" 
-        android:typeface="normal">
-    </Button>
-
-    <Button
-        android:id="@+id/btnSquid" 
-        android:text="@string/squid_ap_sim" 
-        android:layout_width="fill_parent" 
-        android:layout_height="wrap_content" 
-        android:typeface="normal">
-    </Button>
-  </TableRow>
-
+  
   <!-- Will span all columns -->
+  <Button
+        android:id="@+id/btnTerm" 
+        android:text="@string/start_terminal" 
+        android:layout_width="fill_parent" 
+        android:layout_height="wrap_content" 
+        android:typeface="normal">
+  </Button>
+  
   <TextView
       android:id="@+id/txtOutput" 
       android:layout_width="fill_parent" 

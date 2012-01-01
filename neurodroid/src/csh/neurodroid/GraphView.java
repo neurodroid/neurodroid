@@ -190,7 +190,7 @@ public class GraphView extends View {
                     lasth = h;
                 }
                 paint.setStrokeWidth(2.0f);
-                paint.setColor(Color.WHITE);
+                paint.setColor(Color.LTGRAY);
                 datalength = values.size();
                 colwidth = (width - (2 * horborder)) / datalength;
                 halfcol = colwidth / 2;
@@ -203,8 +203,6 @@ public class GraphView extends View {
                         canvas.drawLine(((i - 1) * colwidth) + (horstart + 1) + halfcol, (verborder - lasth) + graphheight, (i * colwidth) + (horstart + 1) + halfcol, (verborder - h) + graphheight, paint);
                     lasth = h;
                 }
-                paint.setColor(Color.LTGRAY);
-                paint.setStrokeWidth(2.0f);
             }
         }
 

@@ -9,7 +9,6 @@ package csh.neurodroid;
 import java.util.ArrayList;
 
 import android.app.Activity;
-
 import android.os.Bundle;
 
 public class Graph extends Activity {
@@ -28,8 +27,8 @@ public class Graph extends Activity {
         @SuppressWarnings("unchecked")
         ArrayList<Float> array = (ArrayList<Float>)getIntent().getSerializableExtra("csh.neurodroid.grapharray");
         @SuppressWarnings("unchecked")
-        ArrayList<Float> stdarray = (ArrayList<Float>)getIntent().getSerializableExtra("csh.neurodroid.stdarray");
-        gv.setGraph(array, stdarray, title);
+        ArrayList<Float> stdArray = (ArrayList<Float>)getIntent().getSerializableExtra("csh.neurodroid.stdarray");
+        gv.setGraph(array, stdArray, title);
         gv.invalidate();
     }
 

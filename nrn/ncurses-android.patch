@@ -1,0 +1,25 @@
+--- ./form/fty_num.c	2010-01-23 21:14:36.000000000 +0000
++++ ./form/fty_num.c	2012-01-02 14:30:46.916295844 +0000
+@@ -36,11 +36,11 @@
+ 
+ MODULE_ID("$Id: fty_num.c,v 1.28 2010/01/23 21:14:36 tom Exp $")
+ 
+-#if HAVE_LOCALE_H
++#if HAVE_LOCALE_H && !defined(ANDROID)
+ #include <locale.h>
+ #endif
+ 
+-#if HAVE_LOCALE_H
++#if HAVE_LOCALE_H && !defined(ANDROID)
+ #define isDecimalPoint(c) ((c) == ((L && L->decimal_point) ? *(L->decimal_point) : '.'))
+ #else
+ #define isDecimalPoint(c) ((c) == '.')
+@@ -96,7 +96,7 @@
+ 	  argn->low = args->low;
+ 	  argn->high = args->high;
+ 
+-#if HAVE_LOCALE_H
++#if HAVE_LOCALE_H && !defined(ANDROID)
+ 	  argn->L = localeconv();
+ #else
+ 	  argn->L = NULL;

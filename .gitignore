@@ -90,6 +90,9 @@ neurodroid/obj/*
 neurodroid/tests/bin
 neurodroid/tests/bin/*
 
+nrn/ncurses-5.9
+nrn/ncurses-*
+
 .DS_Store
 .AppleDouble
 

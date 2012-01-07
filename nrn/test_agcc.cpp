@@ -10,10 +10,14 @@
 #define DISCRETE_EVENT_OBSERVER 1
 /* end confdefs.h.  */
 
+#include <string>
+#include <exception>
+#include <c++/4.4.3/iostream>
+
 int
 main ()
 {
-
+    
   ;
   return 0;
 }

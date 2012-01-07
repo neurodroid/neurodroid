@@ -1,13 +1,23 @@
+#! /bin/bash
+
 NDKDIR=${HOME}/android-ndk-r7
 
 LIBSTDCXXDIR=${NDKDIR}/sources/cxx-stl/gnu-libstdc++
 LIBSTDCXXINC=${LIBSTDCXXDIR}/include
-LIBSTDCXXLIB="-L${LIBSTDCXXDIR}/libs/${ARCH} -lgnustl_static"
+LIBSTDCXXLIB="-L`pwd`"
+TOOLCHAIN=${HOME}/android-toolchain
+LIBSTDCXXLIB="-lstdc++"
 
 TARGET=`pwd`/${ARCH}
 
-cccmd="agcc -O0 -c -o test_agcc.o -I${LIBSTDCXXINC} ${LIBSTDCXXLIB} test_agcc.cpp"
+cccmd="agcc -c test_agcc.cpp -o test_agcc.o"
 echo ${cccmd}
 ${cccmd}
 
-agcc -o test.out test_agcc.o 
+arcmd="${TOOLCHAIN}/bin/arm-linux-androideabi-ar rcs libtest.a test_agcc.o"
+echo ${arcmd}
+$arcmd
+
+ldcmd="agcc ${LIBSTDCXXLIB} -L`pwd` -ltest -o test.out"
+echo  ${ldcmd}
+${ldcmd}

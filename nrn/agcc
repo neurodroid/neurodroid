@@ -38,17 +38,17 @@ use strict;
 my $GCC = `which arm-linux-androideabi-gcc`;
 $GCC = qx(cd `dirname $GCC`; /bin/pwd);
 chomp $GCC;
-die "bad arm-linux-androideabi-gcc path" if $GCC !~ /(.*)\/prebuilt\//;
+# die "bad arm-linux-androideabi-gcc path" if $GCC !~ /(.*)\/prebuilt\//;
 my $HOME = $ENV{"HOME"};
 my $DROID = "$HOME/android-cm/system"; #$1;
 my $TARGET = "android-8";
-my $NDK = "$HOME/android-ndk-r6b";
+my $NDK = "$HOME/android-ndk-r7";
 # my $ALIB = "$DROID/out/target/product/p990/obj/lib";
-my $ALIB = "$NDK/platforms/$TARGET/arch-arm/usr/lib";
-my $TOOLCHAIN = "$NDK/toolchains/arm-linux-androideabi-4.4.3/prebuilt/linux-x86";
+my $TOOLCHAIN = "$HOME/android-toolchain";
+my $SYSROOT = "$TOOLCHAIN/sysroot";
+# my $ARMELFDIR="$TOOLCHAIN/arm-linux-androideabi/lib/ldscripts";
 
-my @include_paths = (
-      "-I$NDK/platforms/$TARGET/arch-arm/usr/include");
+my @include_paths = ();
 
 my @preprocess_args = (
     "-D__ARM_ARCH_5__",
@@ -56,71 +56,69 @@ my @preprocess_args = (
     "-D__ARM_ARCH_5E__",
     "-D__ARM_ARCH_5TE__", # Already defined by toolchain
     "-DANDROID",
-    "-DSK_RELEASE",
-    "-DNDEBUG",
-    # "-include", "$DROID/system/core/include/arch/linux-arm/AndroidConfig.h",
-    "-UDEBUG");
+    "-DNDEBUG");
+    # "-include", "$DROID/system/core/include/arch/linux-arm/AndroidConfig.h",);
 
 my @warn_args = (
-    "-Wall",
-    "-Wno-unused", # why?
-    "-Wno-multichar", # why?
-    "-Wstrict-aliasing=2"); # Implicit in -Wall per texinfo
+    "-Wno-psabi"); # Implicit in -Wall per texinfo
 
 my @compile_args = (
+    "-MMD",
+    "-MP",
     "-march=armv5te",
     "-mtune=xscale",
     "-msoft-float",
-    "-mthumb-interwork",
+    "-mthumb",
+    "--sysroot=$SYSROOT",
     "-fpic",
-    "-fno-exceptions",
+    "-fexceptions",
+    "-frtti",
     "-ffunction-sections",
-    "-fno-short-enums",
-    "-funwind-tables", # static exception-like tables
-    "-fstack-protector", # check guard variable before return
-    "-fmessage-length=0"); # No line length limit to error messages
+    "-funwind-tables"); # static exception-like tables
+    # "-fstack-protector"); # check guard variable before return
 
 my @optimize_args = (
     "-O2",
-    "-finline-functions",
-    "-finline-limit=300",
-    "-fno-inline-functions-called-once",
-    "-fgcse-after-reload",
-    "-frerun-cse-after-loop", # Implicit in -O2 per texinfo
-    "-frename-registers",
+    "-finline-limit=64",
     "-fomit-frame-pointer",
-    "-fstrict-aliasing", # Implicit in -O2 per texinfo
-    "-funswitch-loops");
+    "-fno-strict-aliasing");
 
 my @link_args = (
-    "-Bdynamic",
-    "-Wl,-T,armelf.x",
-    "-Wl,-dynamic-linker,/system/bin/linker",
-    "-Wl,--gc-sections",
-    "-Wl,-z,nocopyreloc",
+    # "-Bdynamic",
+    # "-Wl,-T,$ARMELFDIR/armelf_linux_eabi.x",
+    # "-Wl,-dynamic-linker,/system/bin/linker",
+    # "-Wl,--gc-sections",
+    # "-Wl,-z,nocopyreloc",
+    "--sysroot=$SYSROOT",
     "-Wl,--no-undefined",
-    "-Wl,-rpath-link=$ALIB",
-    "-L$ALIB",
-    "-nostdlib",
-    "$ALIB/crtend_android.o",
-    "$ALIB/crtbegin_dynamic.o",
+    "-Wl,-z,noexecstack",
+    # "-Wl,-rpath-link=$ALIB",
+    # "-L$SYSROOT/usr/lib",
+    # "-nostdlib",
+    # "$ALIB/crtend_android.o",
+    # "$ALIB/crtbegin_static.o",
     # "$TOOLCHAIN/lib/gcc/arm-linux-androideabi/4.4.3/libgcc.a",
+    # "$TOOLCHAIN/arm-linux-androideabi/lib/libstdc++.a",
     "-lgcc",
     "-lc",
-    "-lm");
+    "-lm",
+    "-ldl",
+    "-llog");
     
 # Also need: -Wl,-soname,libXXXX.so
 my @shared_args = (
-    "-nostdlib",
-    "-Wl,-T,armelf.xsc",
+    # "-nostdlib",
+    # "-Wl,-T,$ARMELFDIR/armelf_linux_eabi.xsc",
     "-Wl,--gc-sections",
     "-Wl,-shared,-Bsymbolic",
-    "-L$ALIB",
+    # "-L$SYSROOT/usr/lib",
     "-Wl,--no-whole-archive",
     "-lc",
     "-lm",
     "-Wl,--no-undefined",
+    "-Wl,-z,noexecstack",
     # "$TOOLCHAIN/lib/gcc/arm-linux-androideabi/4.4.3/libgcc.a",
+    # "$NDK/sources/crystax/libs/x86/4.4.3/libcrystax_shared.a",
     "-lgcc",
     "-Wl,--whole-archive"); # .a, .o input files go *after* here
 

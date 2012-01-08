@@ -45,10 +45,10 @@ my $TARGET = "android-8";
 my $NDK = "$HOME/android-ndk-r7";
 # my $ALIB = "$DROID/out/target/product/p990/obj/lib";
 my $TOOLCHAIN = "$HOME/android-toolchain";
-my $SYSROOT = "$TOOLCHAIN/sysroot";
+my $MSYSROOT = "$TOOLCHAIN/sysroot";
 # my $ARMELFDIR="$TOOLCHAIN/arm-linux-androideabi/lib/ldscripts";
 
-my @include_paths = ();
+my @include_paths = ("-I$MSYSROOT/usr/include");
 
 my @preprocess_args = (
     "-D__ARM_ARCH_5__",
@@ -56,7 +56,8 @@ my @preprocess_args = (
     "-D__ARM_ARCH_5E__",
     "-D__ARM_ARCH_5TE__", # Already defined by toolchain
     "-DANDROID",
-    "-DNDEBUG");
+    "-DNDEBUG",
+    "--sysroot=$MSYSROOT");
     # "-include", "$DROID/system/core/include/arch/linux-arm/AndroidConfig.h",);
 
 my @warn_args = (
@@ -69,7 +70,6 @@ my @compile_args = (
     "-mtune=xscale",
     "-msoft-float",
     "-mthumb",
-    "--sysroot=$SYSROOT",
     "-fpic",
     "-fexceptions",
     "-frtti",
@@ -89,37 +89,36 @@ my @link_args = (
     # "-Wl,-dynamic-linker,/system/bin/linker",
     # "-Wl,--gc-sections",
     # "-Wl,-z,nocopyreloc",
-    "--sysroot=$SYSROOT",
+    "-Wl,--sysroot=$MSYSROOT",
+    # "-Wl,-rpath-link=$ALIB",
+    # "-L$MSYSROOT/usr/lib",
+    "-nostdlib",
+    # "${MSYSROOT}/usr/lib/crtend_android.o",
+    # "${MSYSROOT}/usr/lib/crtbegin_static.o",
+    "$TOOLCHAIN/lib/gcc/arm-linux-androideabi/4.4.3/libgcc.a",
     "-Wl,--no-undefined",
     "-Wl,-z,noexecstack",
-    # "-Wl,-rpath-link=$ALIB",
-    # "-L$SYSROOT/usr/lib",
-    # "-nostdlib",
-    # "$ALIB/crtend_android.o",
-    # "$ALIB/crtbegin_static.o",
-    # "$TOOLCHAIN/lib/gcc/arm-linux-androideabi/4.4.3/libgcc.a",
     # "$TOOLCHAIN/arm-linux-androideabi/lib/libstdc++.a",
-    "-lgcc",
+    # "-lgcc",
     "-lc",
-    "-lm",
-    "-ldl",
-    "-llog");
+    "-lm");
     
 # Also need: -Wl,-soname,libXXXX.so
 my @shared_args = (
     # "-nostdlib",
     # "-Wl,-T,$ARMELFDIR/armelf_linux_eabi.xsc",
+    "-Wl,--sysroot=$MSYSROOT",
     "-Wl,--gc-sections",
     "-Wl,-shared,-Bsymbolic",
-    # "-L$SYSROOT/usr/lib",
+    # "-L$MSYSROOT/usr/lib",
     "-Wl,--no-whole-archive",
     "-lc",
     "-lm",
     "-Wl,--no-undefined",
     "-Wl,-z,noexecstack",
-    # "$TOOLCHAIN/lib/gcc/arm-linux-androideabi/4.4.3/libgcc.a",
+    "$TOOLCHAIN/lib/gcc/arm-linux-androideabi/4.4.3/libgcc.a",
     # "$NDK/sources/crystax/libs/x86/4.4.3/libcrystax_shared.a",
-    "-lgcc",
+    # "-lgcc",
     "-Wl,--whole-archive"); # .a, .o input files go *after* here
 
 # Now implement a quick parser for a gcc-like command line

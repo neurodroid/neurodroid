@@ -613,7 +613,16 @@ public class NeuroDroid extends Activity
             os.close();
         }
         catch (IOException e) {
-            throw new RuntimeException(e);
+            new AlertDialog.Builder(NeuroDroid.this)
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .setTitle(R.string.error)
+                .setMessage(R.string.copy_binary_failure)
+                .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int whichButton) {
+                            finish();
+                        }
+                    })
+                .create();
         }
 
         String[] chmodlist = {getChmod(), "755", NRNBIN};

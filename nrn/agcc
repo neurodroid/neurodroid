@@ -40,13 +40,10 @@ $GCC = qx(cd `dirname $GCC`; /bin/pwd);
 chomp $GCC;
 # die "bad arm-linux-androideabi-gcc path" if $GCC !~ /(.*)\/prebuilt\//;
 my $HOME = $ENV{"HOME"};
-my $DROID = "$HOME/android-cm/system"; #$1;
 my $TARGET = "android-8";
 my $NDK = "$HOME/android-ndk-r7";
-# my $ALIB = "$DROID/out/target/product/p990/obj/lib";
 my $TOOLCHAIN = "$HOME/android-toolchain";
 my $MSYSROOT = "$TOOLCHAIN/sysroot";
-# my $ARMELFDIR="$TOOLCHAIN/arm-linux-androideabi/lib/ldscripts";
 
 my @include_paths = ("-I$MSYSROOT/usr/include");
 

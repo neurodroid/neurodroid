@@ -173,6 +173,8 @@
     
     <!-- Misc -->
     <string name="wait_msg">Please wait&#8230;</string>
+    <string name="error">Error</string>
+    <string name="copy_binary_failure">Couldn\'t copy NEURON executable to application directory. Aborting now.</string>
 
     <!-- Colours -->
     <color name="gray">#ffff0000</color>

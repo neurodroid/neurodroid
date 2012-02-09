@@ -1,6 +1,10 @@
 #! /bin/bash
 
 NDKDIR=${HOME}/android-ndk-r7
+MYAR=arm-linux-androideabi-ar
+MYRANLIB=arm-linux-androideabi-ranlib
+MYNM=arm-linux-androideabi-nm
+MYSTRIP=arm-linux-androideabi-strip
 
 if test -n "$1"; then
     MYAGCC=agcc-vfp
@@ -12,6 +16,10 @@ fi
 
 TARGET=`pwd`/${ARCH}
 
-#  CC=agcc CXX=agcc CXXFLAGS="-I${NDKDIR}/sources/cxx-stl/stlport/stlport/ -fno-rtti -fno-exceptions" LDFLAGS="-L${NDKDIR}/sources/cxx-stl/stlport/libs/${ARCH} -lstlport_static" ./nrn-hg/configure --enable-static --disable-shared --without-x --without-nmodl --without-memacs --prefix=${TARGET} --host=x86-linux --build=arm-eabi
+LIBSTDCXXINC="-I${NDKDIR}/sources/cxx-stl/gnu-libstdc++/include -I${NDKDIR}/sources/cxx-stl/gnu-libstdc++/libs/armeabi/include"
+LIBSTDCXXLIB="-L${NDKDIR}/sources/cxx-stl/gnu-libstdc++/libs/armeabi -lgnustl_static"
 
-CC=${MYAGCC} CXX=${MYAGCC} CXXFLAGS="-fno-rtti -fno-exceptions" LDFLAGS="-L`pwd` -lstdc++" ./nrn-hg/configure --enable-static --disable-shared --without-x --without-nmodl --with-gnu-ld --prefix=${TARGET} --host=x86-linux --build=arm-eabi
+AR=${MYAR} RANLIB=${MYRANLIB} NM=${MYNM} STRIP=${MYSTRIP} CC=${MYAGCC} CXX=${MYAGCC} \
+    CXXFLAGS="${LIBSTDCXXINC} -fexceptions -frtti" \
+    LDFLAGS="${LIBSTDCXXLIB} -L`pwd`" \
+    ./nrn-hg/configure --enable-static --disable-shared --without-x --without-nmodl --with-gnu-ld --prefix=${TARGET} --host=x86-linux --build=arm-eabi

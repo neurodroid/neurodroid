@@ -16,33 +16,16 @@
 
 package csh.neurodroid;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.ArrayList;
 import java.util.Scanner;
+
+import android.util.Log;
 
 public class ShellUtils {
 
-    private static String join(String[] sa, String delimiter) {
-        Collection<String> s = Arrays.asList(sa);
-        StringBuffer buffer = new StringBuffer();
-        Iterator<String> iter = s.iterator();
-        while (iter.hasNext()) {
-            buffer.append(iter.next());
-            if (iter.hasNext()) {
-                buffer.append(delimiter);
-            }
-        }
-        return buffer.toString();
-    }
-    
     private static String getChmod() throws IOException {
         String chmod = "/system/bin/chmod";
         if (!(new File(chmod)).exists()) {
@@ -90,39 +73,26 @@ public class ShellUtils {
         if (!binDir.exists()) {
             binDir.mkdirs();
         }
-        
-        String NL = System.getProperty("line.separator");
-        ProcessBuilder pb = new ProcessBuilder(binName);
-        pb.directory(binDir);
-        Map<String, String> env = pb.environment();
+ 
+        /* Can't set the environment on Android <= 2.2 with
+         * ProcessBuilder. Resorting back to old-school exec.
+         */
+        ArrayList<String> envp = new ArrayList<String>();
         if (envPrepend != null && envPrepend.length > 1 && envPrepend.length % 2 ==0) {
             for (int nenv=0; nenv<envPrepend.length; nenv+=2) {
-                env.put(envPrepend[nenv], envPrepend[nenv+1]);
+                envp.add(envPrepend[nenv] + "=" + envPrepend[nenv+1]);
             }
         }
-        
-        pb.redirectErrorStream(stderr);
-        
-        if (root) {
-            String[] sucmd = {"su", "-c", join(binName, " ")};
-            pb.command(sucmd);
-        } else {
-            pb.command(binName);
-        }
-
-        Process process = pb.start();
-        
-        if (toStdIn != null) {
-            BufferedWriter writer = new BufferedWriter(
-                    new OutputStreamWriter(process.getOutputStream()) );
-            writer.write(toStdIn + "\n");
-            writer.flush();
-        }
-
+        Process process = Runtime.getRuntime().exec(binName, 
+                envp.toArray(new String[0]), binDir);
         process.waitFor();
-            
+        
+        Scanner outscanner = new Scanner(process.getInputStream());
+        Scanner errscanner = new Scanner(process.getErrorStream());
+        String NL = System.getProperty("line.separator");
+        
         String output = "";
-        Scanner outscanner = new Scanner(new BufferedInputStream(process.getInputStream()));
+        
         try {
             while (outscanner.hasNextLine()) {
                 output += outscanner.nextLine();
@@ -132,9 +102,19 @@ public class ShellUtils {
         finally {
             outscanner.close();
         }
+        if (stderr) {
+            output += NL + "stderr:" + NL;
+            try {
+                while (errscanner.hasNextLine()) {
+                    output += errscanner.nextLine() + NL;
+                }
+            }
+            finally {
+                errscanner.close();
+            }
+        }
 
-        return output;
-
+        return output;        
     }
     
     public static boolean isMounted(String mountName) {
@@ -157,6 +137,43 @@ public class ShellUtils {
             return isMounted;
         }
         return isMounted;
+    }
+    
+    public static boolean cpuSupportsVfp() throws IOException {
+        /* Read cpu info */
+        FileInputStream fis = new FileInputStream("/proc/cpuinfo");
+        Scanner scanner = new Scanner(fis);
+        System.getProperty("line.separator");
+
+        boolean vfp = false;
+        try {
+            Log.v(NeuroDroid.TAG, "Parsing /proc/cpuinfo for vfp support");
+            while (scanner.hasNextLine()) {
+                if (!vfp && (scanner.findInLine("vfpv3")!=null)) {
+                    vfp = true;
+                }
+                Log.v(NeuroDroid.TAG, scanner.nextLine());
+            }
+        }
+        finally {
+            scanner.close();
+        }
+        
+        return vfp;
+    }
+
+    public static String cpuInfo() {
+        StringBuffer strContent = new StringBuffer("");
+        try {
+            FileInputStream fis = new FileInputStream("/proc/cpuinfo");
+            int ch;
+            while( (ch = fis.read()) != -1)
+                strContent.append((char)ch);
+        } catch (IOException e) {
+            Log.e(NeuroDroid.TAG, "Couldn't read /proc/cpuinfo");
+            return "";
+        }
+        return strContent.toString();
     }
 
 }

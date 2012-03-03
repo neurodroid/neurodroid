@@ -12,6 +12,8 @@ import java.util.Scanner;
 import java.util.ArrayList;
 
 import android.app.Activity;
+import android.app.ActivityManager;
+import android.app.ActivityManager.RunningServiceInfo;
 import android.app.ProgressDialog;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -21,6 +23,7 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import android.os.Bundle;
+import android.os.Environment;
 
 import android.view.View;
 import android.view.Menu;
@@ -64,9 +67,9 @@ public class NeuroDroid extends Activity
 
     private ProgressDialog pd;
     private TextView tv;
-    private boolean supportsVfp;
+    private boolean supportsVfp, currentPrompt;
     private String nrnoutput="", nrnversion, curHocFile;
-    private File binDir, cacheDir;
+    private File binDir, cacheDir, extDir;
     private String nrnBinPath, nrnHomePath;
 
     /** Called when the activity is first created. */
@@ -88,7 +91,7 @@ public class NeuroDroid extends Activity
         /* Check whether the cpu supports vfp instructions */
         supportsVfp = false;
         try {
-            supportsVfp = cpuSupportsVfp();
+            supportsVfp = ShellUtils.cpuSupportsVfp();
         } catch (IOException e) {
             Toast.makeText(this, "Couldn't read cpu info", Toast.LENGTH_SHORT).show();
             supportsVfp = false;
@@ -102,6 +105,14 @@ public class NeuroDroid extends Activity
         nrnBinPath = binDir.getPath() + "/" + NRNBINNAME;
         nrnHomePath = getDir(HOMEPNT, Context.MODE_WORLD_READABLE).getPath();
  
+        if (externalStorageIsWritable()) {
+            extDir = Environment.getExternalStorageDirectory();
+        } else {
+            extDir = new File("/");
+        }
+        
+        currentPrompt = false;
+        
         /* Copy the nrniv binary to binDir and make executable.
          * Use vfp only if it's both supported and enabled in the preferences.
          */
@@ -112,6 +123,17 @@ public class NeuroDroid extends Activity
         nrnversion = runNrn(cmdlist, false);
         Log.v(TAG, "Neuron version: " + nrnversion);
 
+        /* Run terminal with NEURON environment set up */
+        Button buttonTermPrompt = (Button)findViewById(R.id.btnTermPrompt);
+        buttonTermPrompt.setOnClickListener(new OnClickListener() {
+                public void onClick(View v) {
+                    /* Check whether a new version of the Terminal
+                     * Emulator has been installed
+                     */
+                    currentPrompt = true;
+                    launchTerm(currentPrompt);
+                }});
+
         /* Run neuron in terminal */
         Button buttonTerm = (Button)findViewById(R.id.btnTerm);
         buttonTerm.setOnClickListener(new OnClickListener() {
@@ -119,7 +141,8 @@ public class NeuroDroid extends Activity
                     /* Check whether a new version of the Terminal
                      * Emulator has been installed
                      */
-                    launchTerm();
+                    currentPrompt = false;
+                    launchTerm(currentPrompt);
                 }});
 
         /* Load hoc file using a simple file dialog */
@@ -128,7 +151,7 @@ public class NeuroDroid extends Activity
                 public void onClick(View v) {
                     Intent intent = new Intent(getBaseContext(),
                                                FileDialog.class);
-                    intent.putExtra(FileDialog.START_PATH, "/");
+                    intent.putExtra(FileDialog.START_PATH, extDir.getPath());
                     intent.putExtra(FileDialog.BUTTON_LABEL, getString(R.string.select));
                     startActivityForResult(intent, REQUEST_LOAD);
                 }});
@@ -207,7 +230,8 @@ public class NeuroDroid extends Activity
                      })
                  .setNegativeButton(R.string.app_terminal_builtin, new DialogInterface.OnClickListener() {
                          public void onClick(DialogInterface dialog, int whichButton) {
-                             runTerm(new Intent(getBaseContext(), Term.class));
+                             runTerm(new Intent(getBaseContext(), Term.class), 
+                                     currentPrompt, builtinTermRunning());
                          }
                      })
                  .create();
@@ -301,12 +325,33 @@ public class NeuroDroid extends Activity
             
     }
 
-    private void launchTerm() {
+    private boolean builtinTermRunning() {
+        ActivityManager manager = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
+        for (RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+             if ("csh.neurodroid.TermService".equals(service.service.getClassName())) {
+                 return true;
+             }
+        }
+        return false;
+    }
+    
+    private boolean extTermRunning() {
+        ActivityManager manager = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
+        for (RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+             if ("jackpal.androidterm.TermService".equals(service.service.getClassName())) {
+                 return true;
+             }
+        }
+        return false;
+    }
+ 
+    private void launchTerm(boolean prompt) {
+        /* Is a reminal emulator running? */
         SharedPreferences prefs = getBaseContext().getSharedPreferences("csh.neurodroid_preferences", 0);
         boolean useBuiltin = prefs.getBoolean("cb_builtin", true);
         Intent builtinTerm = new Intent(getBaseContext(), Term.class); 
         if (useBuiltin) {
-            runTerm(builtinTerm);
+            runTerm(builtinTerm, prompt, builtinTermRunning());
         } else {
             /* If Terminal Emulator is not installed or outdated,
              * offer to download
@@ -322,22 +367,43 @@ public class NeuroDroid extends Activity
                     int patchCode = pinfo.versionCode;
 
                     if (patchCode < 32) {
-                        runTerm(builtinTerm);
+                        runTerm(builtinTerm, prompt, builtinTermRunning());
                     } else {
                         Intent intent = new Intent(Intent.ACTION_MAIN);
                         intent.setComponent(termComp);
-                        runTerm(intent);
+                        runTerm(intent, prompt, extTermRunning());
                     }
 
                 } catch (PackageManager.NameNotFoundException e) {
-                    runTerm(builtinTerm);
+                    runTerm(builtinTerm, prompt, builtinTermRunning());
                 }
             }
         }
     }
 
-    private void runTerm(Intent intent) {
-        String initCmd = "cd /data/data/csh.neurodroid/ && NEURONHOME=" + nrnHomePath + " ./nrniv";
+    private void runTerm(Intent intent, boolean prompt, boolean running) {
+        /* If the terminal is running, abort */
+        if (running) {
+            new AlertDialog.Builder(NeuroDroid.this)
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .setTitle(R.string.warning)
+                .setMessage(R.string.term_service_running)
+                .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                        ;
+                    }
+                })
+                .create().show();
+            return;
+        }
+        
+        String initCmd = "cd " + extDir.getPath() + "; " +
+                         "export PATH=" + binDir.getPath() + ":${PATH}; " +
+                         "export NEURONHOME=" + nrnHomePath + ";";
+        if (!prompt) {
+            initCmd = "cd /data/data/csh.neurodroid/ && NEURONHOME=" + 
+                    nrnHomePath + " ./nrniv";
+        }
         intent.putExtra("jackpal.androidterm.iInitialCommand", initCmd);
         startActivity(intent);
     }
@@ -357,44 +423,7 @@ public class NeuroDroid extends Activity
             return TERM_UNAVAILABLE;
         }
     }
-    
-    public static boolean cpuSupportsVfp() throws IOException {
-        /* Read cpu info */
-        FileInputStream fis = new FileInputStream("/proc/cpuinfo");
-        Scanner scanner = new Scanner(fis);
-        System.getProperty("line.separator");
 
-        boolean vfp = false;
-        try {
-            Log.v(TAG, "Parsing /proc/cpuinfo for vfp support");
-            while (scanner.hasNextLine()) {
-                if (!vfp && (scanner.findInLine("vfpv3")!=null)) {
-                    vfp = true;
-                }
-                Log.v(TAG, scanner.nextLine());
-            }
-        }
-        finally {
-            scanner.close();
-        }
-        
-        return vfp;
-    }
-
-    public String cpuInfo() {
-        StringBuffer strContent = new StringBuffer("");
-        try {
-            FileInputStream fis = new FileInputStream("/proc/cpuinfo");
-            int ch;
-            while( (ch = fis.read()) != -1)
-                strContent.append((char)ch);
-        } catch (IOException e) {
-            Log.e(TAG, "Couldn't read /proc/cpuinfo");
-            return "";
-        }
-        return strContent.toString();
-    }
-    
     /** Copy an assets file to the cache directory */
     public void saveAssetsFile(String src, String target) {
 
@@ -570,7 +599,7 @@ public class NeuroDroid extends Activity
                             finish();
                         }
                     })
-                .create();
+                .create().show();
         }
 
         try {
@@ -622,6 +651,30 @@ public class NeuroDroid extends Activity
             Log.e(TAG, e.getMessage());
         }
         return nrnout;
+    }
+
+
+    public static boolean externalStorageIsWritable() {
+        /* Check sd card state */
+        String state = Environment.getExternalStorageState();
+
+        boolean extStorAvailable = false;
+        boolean extStorWriteable = false;
+
+        if (Environment.MEDIA_MOUNTED.equals(state)) {
+            // We can read and write the media
+            extStorAvailable = extStorWriteable = true;
+        } else if (Environment.MEDIA_MOUNTED_READ_ONLY.equals(state)) {
+            // We can only read the media
+            extStorAvailable = true;
+            extStorWriteable = false;
+        } else {
+            // Something else is wrong. It may be one of many other states, but all we need
+            //  to know is we can neither read nor write
+            extStorAvailable = extStorWriteable = false;
+        }
+
+        return extStorAvailable && extStorWriteable;
     }
     
     /* Load libraries for native part of the app.

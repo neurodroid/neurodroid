@@ -32,7 +32,7 @@ public class Preferences extends PreferenceActivity {
 
         supportsVfp = false;
         try {
-            supportsVfp = NeuroDroid.cpuSupportsVfp();
+            supportsVfp = ShellUtils.cpuSupportsVfp();
         } catch (IOException e) {
             Toast.makeText(this, "Couldn't read cpu info", Toast.LENGTH_SHORT).show();
             supportsVfp = false;

@@ -1,64 +1,83 @@
 <?xml version="1.0" encoding="utf-8"?>
-<TableLayout 
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
-    android:layout_width="fill_parent"
+<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:stretchColumns="*">
+    android:orientation="vertical"
+    android:stretchColumns="*" >
 
-  <TableRow>
-    <Button
-        android:id="@+id/btnSquid" 
-        android:text="@string/squid_ap_sim" 
-        android:layout_width="fill_parent" 
-        android:layout_height="wrap_content" 
-        android:typeface="normal">
-    </Button>
-      
-    <Button
-        android:id="@+id/btnLoadFile" 
-        android:text="@string/load_hoc" 
-        android:layout_width="fill_parent" 
-        android:layout_height="wrap_content" 
-        android:typeface="normal">
-    </Button>
-  </TableRow>
+    <TableRow
+        android:baselineAligned="false" >
 
-  <TableRow>
-    <Button
-        android:id="@+id/btnBenchmark" 
-        android:text="@string/run_benchmark" 
-        android:layout_width="fill_parent" 
-        android:layout_height="wrap_content" 
-        android:typeface="normal">
-    </Button>
+        <Button
+            android:id="@+id/btnSquid"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:text="@string/squid_ap_sim"
+            android:typeface="normal" >
+        </Button>
 
-    <Button
-        android:id="@+id/btnTestStd" 
-        android:text="@string/test_std" 
-        android:layout_width="fill_parent" 
-        android:layout_height="wrap_content" 
-        android:typeface="normal">
-    </Button>
+        <Button
+            android:id="@+id/btnLoadFile"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:text="@string/load_hoc"
+            android:typeface="normal" >
+        </Button>
+    </TableRow>
 
-  </TableRow>
-  
-  <!-- Will span all columns -->
-  <Button
-        android:id="@+id/btnTerm" 
-        android:text="@string/start_terminal" 
-        android:layout_width="fill_parent" 
-        android:layout_height="wrap_content" 
-        android:typeface="normal">
-  </Button>
-  
-  <TextView
-      android:id="@+id/txtOutput" 
-      android:layout_width="fill_parent" 
-      android:layout_height="wrap_content" 
-      android:typeface="normal"
-      android:scrollbars="vertical"
-      android:isScrollContainer="true">
-  </TextView>
+    <TableRow
+        android:baselineAligned="false" >
+
+        <Button
+            android:id="@+id/btnBenchmark"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:text="@string/run_benchmark"
+            android:typeface="normal" >
+        </Button>
+
+        <Button
+            android:id="@+id/btnTestStd"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:text="@string/test_std"
+            android:typeface="normal" >
+        </Button>
+    </TableRow>
+
+    <!-- Will span all columns -->
+
+    <TableRow android:baselineAligned="false" >
+
+        <Button
+            android:id="@+id/btnTermPrompt"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:text="@string/start_terminal_prompt"
+            android:typeface="normal" >
+        </Button>
+
+        <Button
+            android:id="@+id/btnTerm"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:text="@string/start_terminal"
+            android:typeface="normal" >
+        </Button>
+    </TableRow>
+
+    <ScrollView
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:scrollbars="vertical" >
+
+        <TextView
+            android:id="@+id/txtOutput"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:typeface="normal" >
+        </TextView>
+    </ScrollView>
 
 </TableLayout>

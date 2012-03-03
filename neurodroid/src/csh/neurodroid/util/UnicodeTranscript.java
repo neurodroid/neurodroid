@@ -56,7 +56,6 @@ public class UnicodeTranscript {
 
     private int mScreenFirstRow = 0;
 
-    private char[] tmpChar = new char[2];
     private char[] tmpLine;
     private byte[] tmpColor;
 
@@ -324,7 +323,6 @@ public class UnicodeTranscript {
         }
 
         int screenFirstRow = mScreenFirstRow;
-        int scrollLen = bottomMargin - topMargin;
         int topMarginInt = externalToInternalRow(topMargin);
         int bottomMarginInt = externalToInternalRow(bottomMargin);
 

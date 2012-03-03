@@ -59,7 +59,7 @@ import csh.neurodroid.util.TermSettings;
 public class EmulatorView extends View implements GestureDetector.OnGestureListener {
 
     private final String TAG = "EmulatorView";
-    private final boolean LOG_KEY_EVENTS = TermDebug.DEBUG && false;
+    private final boolean LOG_KEY_EVENTS = false;
 
     private TermSettings mSettings;
     private TermViewFlipper mViewFlipper;
@@ -106,6 +106,7 @@ public class EmulatorView extends View implements GestureDetector.OnGestureListe
      */
     private int mTextSize;
 
+    @SuppressWarnings("unused")
     private int mCursorStyle;
     private int mCursorBlink;
 
@@ -299,24 +300,12 @@ public class EmulatorView extends View implements GestureDetector.OnGestureListe
                 EditorInfo.TYPE_CLASS_TEXT :
                 EditorInfo.TYPE_NULL;
         return new InputConnection() {
-            private boolean mInBatchEdit;
             /**
              * Used to handle composing text requests
              */
             private int mCursor;
             private int mComposingTextStart;
             private int mComposingTextEnd;
-            private int mSelectedTextStart;
-            private int mSelectedTextEnd;
-
-            private void sendChar(int c) {
-                try {
-                    mapAndSend(c);
-                } catch (IOException ex) {
-
-                }
-            }
-
             private void sendText(CharSequence text) {
                 int n = text.length();
                 char c;
@@ -358,7 +347,6 @@ public class EmulatorView extends View implements GestureDetector.OnGestureListe
                 mCursor = 0;
                 mComposingTextStart = 0;
                 mComposingTextEnd = 0;
-                mInBatchEdit = true;
                 return true;
             }
 
@@ -380,7 +368,6 @@ public class EmulatorView extends View implements GestureDetector.OnGestureListe
                 if (TermDebug.LOG_IME) {
                     Log.w(TAG, "endBatchEdit");
                 }
-                mInBatchEdit = false;
                 return true;
             }
 
@@ -547,33 +534,11 @@ public class EmulatorView extends View implements GestureDetector.OnGestureListe
                 }
                 int length = mImeBuffer.length();
                 if (start == end && start > 0 && start < length) {
-                    mSelectedTextStart = mSelectedTextEnd = 0;
                     mCursor = start;
                 } else if (start < end && start > 0 && end < length) {
-                    mSelectedTextStart = start;
-                    mSelectedTextEnd = end;
                     mCursor = start;
                 }
                 return true;
-            }
-
-            public boolean setComposingRegion(int start, int end) {
-                if (TermDebug.LOG_IME) {
-                    Log.w(TAG, "setComposingRegion " + start + "," + end);
-                }
-                if (start < end && start > 0 && end < mImeBuffer.length()) {
-                    clearComposingText();
-                    mComposingTextStart = start;
-                    mComposingTextEnd = end;
-                }
-                return true;
-            }
-
-            public CharSequence getSelectedText(int flags) {
-                if (TermDebug.LOG_IME) {
-                    Log.w(TAG, "getSelectedText " + flags);
-                }
-                return mImeBuffer.substring(mSelectedTextStart, mSelectedTextEnd+1);
             }
 
         };
@@ -1701,8 +1666,6 @@ class TermKeyListener {
     /** Key code constant: Blue "programmable" key.
      * On TV remotes, acts as a contextual/programmable key. */
     public static final int KEYCODE_PROG_BLUE       = 186;
-
-    private static final int LAST_KEYCODE           = KEYCODE_PROG_BLUE;
 
     private String[] mKeyCodes = new String[256];
     private String[] mAppKeyCodes = new String[256];

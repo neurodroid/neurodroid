@@ -3,7 +3,6 @@ package csh.neurodroid;
 import java.io.*;
 import java.util.*;
 import java.util.zip.*;
-import java.util.List;
 
 import android.util.Log;
 
@@ -69,12 +68,6 @@ public class UnZip {
     protected void getFile(ZipEntry e, String baseDir) throws IOException {
         String zipName = baseDir + "/" + e.getName();
 
-        String chmod = NeuroDroid.getChmod();
-        List<String> chmodlist = new ArrayList<String>();
-        chmodlist.add(chmod);
-        chmodlist.add("644");
-        chmodlist.add("");
-        
         switch (mode) {
          case EXTRACT:
              // if (zipName.startsWith("/")) {
@@ -117,9 +110,11 @@ public class UnZip {
              os.close();
 
              /* chmod to rwr-r- */
-             chmodlist.set(2, zipName);
-             ProcessBuilder pb = new ProcessBuilder(chmodlist);
-             /* Process process = */ pb.start();
+             try {
+                 ShellUtils.chmod(zipName, "644");
+             } catch (InterruptedException e1) {
+                 Log.e(TAG, e1.getMessage());
+             }
 
              break;
          case LIST:

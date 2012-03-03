@@ -51,21 +51,23 @@ public class NeuroDroid extends Activity
 {
 
     public static final String TAG = "neurodroid";
-    public static final String CACHEDIR = "/data/data/csh.neurodroid/cache";
-    public static final String BINDIR = "/data/data/csh.neurodroid";
-    public static final String NRNBIN = BINDIR + "/nrniv";
-    public static final String NRNHOME = BINDIR + "/nrnhome";
+    public static final String CACHEPNT = "cache";
+    public static final String NRNBINNAME = "nrniv";
     public static final int TERM_UNAVAILABLE=0, TERM_OUTDATED=1, TERM_AVAILABLE=2;
     public String fHoc;
     
+    private static final String HOMEPNT = "nrnhome";
     private static final String[] HOC_ASSETS = {"benchmark.hoc", "squid.hoc", "squid_std.txt"};
     private static final int REQUEST_SAVE=0, REQUEST_LOAD=1, REQUEST_PREFS=2,
         REQUEST_SQUID_BACK=3;
     private static final int DIALOG_MARKETNOTFOUND=0, DIALOG_TERM_UNAVAILABLE=1;
+
     private ProgressDialog pd;
     private TextView tv;
     private boolean supportsVfp;
     private String nrnoutput="", nrnversion, curHocFile;
+    private File binDir, cacheDir;
+    private String nrnBinPath, nrnHomePath;
 
     /** Called when the activity is first created. */
     @Override public void onCreate(Bundle savedInstanceState) {
@@ -76,7 +78,7 @@ public class NeuroDroid extends Activity
         getResources();
         
         /* Create directories */
-        File cacheDir = new File(CACHEDIR);
+        cacheDir = getDir(CACHEPNT, Context.MODE_PRIVATE);
         if (!cacheDir.exists()) {
             cacheDir.mkdirs();
         }
@@ -96,14 +98,18 @@ public class NeuroDroid extends Activity
         SharedPreferences prefs = getBaseContext().getSharedPreferences("csh.neurodroid_preferences", 0);
         boolean prevVfp = prefs.getBoolean("cb_vfp", true);
 
+        binDir = getFilesDir().getParentFile();
+        nrnBinPath = binDir.getPath() + "/" + NRNBINNAME;
+        nrnHomePath = getDir(HOMEPNT, Context.MODE_WORLD_READABLE).getPath();
+ 
         /* Copy the nrniv binary to binDir and make executable.
          * Use vfp only if it's both supported and enabled in the preferences.
          */
-        cpNrnBin(supportsVfp && prevVfp);
+        cpnrnBinPath(supportsVfp && prevVfp);
 
         /* Get version information from NEURON */
-        String[] cmdlist = {NRNBIN, "-c", "print nrnversion()"};
-        nrnversion = runBinary(cmdlist, NRNHOME);
+        String[] cmdlist = {nrnBinPath, "-c", "print nrnversion()"};
+        nrnversion = runNrn(cmdlist, false);
         Log.v(TAG, "Neuron version: " + nrnversion);
 
         /* Run neuron in terminal */
@@ -123,6 +129,7 @@ public class NeuroDroid extends Activity
                     Intent intent = new Intent(getBaseContext(),
                                                FileDialog.class);
                     intent.putExtra(FileDialog.START_PATH, "/");
+                    intent.putExtra(FileDialog.BUTTON_LABEL, getString(R.string.select));
                     startActivityForResult(intent, REQUEST_LOAD);
                 }});
 
@@ -133,8 +140,8 @@ public class NeuroDroid extends Activity
                     String stdcmd = "if (load_file(\"stdrun.hoc\")==1)" +
                         "print \"Successfully opened standard library\"" +
                         "else print \"Failed to open standard library\"";
-                    String[] cmdlist = {NRNBIN, "-c", stdcmd};
-                    nrnoutput = runBinary(cmdlist, NRNHOME);
+                    String[] cmdlist = {nrnBinPath, "-c", stdcmd};
+                    nrnoutput = runNrn(cmdlist, false);
                     tv.setText(nrnversion + "\n" + nrnoutput);
                 }});
 
@@ -155,7 +162,7 @@ public class NeuroDroid extends Activity
             });
 
         /* Check whether we need to install the std lib */
-        if (!(new File(NRNHOME + "/lib/hoc/stdlib.hoc")).exists()) {
+        if (!(new File(nrnHomePath + "/lib/hoc/stdlib.hoc")).exists()) {
             pd =  ProgressDialog.show(this,
                                       this.getString(R.string.wait_msg), "Installing standard library...", true);
             new Thread(new Runnable(){
@@ -174,7 +181,7 @@ public class NeuroDroid extends Activity
         
         /* Check whether we need to install hoc files */
         for (int i=0; i<HOC_ASSETS.length; i++) {
-            String bmfile = CACHEDIR + "/" + HOC_ASSETS[i];
+            String bmfile = cacheDir.getPath() + "/" + HOC_ASSETS[i];
             if (!(new File(bmfile)).exists()) {
                 saveAssetsFile(HOC_ASSETS[i], bmfile);
             }
@@ -251,17 +258,23 @@ public class NeuroDroid extends Activity
 
     
     public void runBenchmark(View v) {
-        runHoc("Running benchmark...", "benchmark.hoc");
+        runHoc("Running benchmark...", "benchmark.hoc", false);
     }
     
     public void runSquid(View v) {
         Intent squidActivity = new Intent(getBaseContext(),
                                           Squid.class);
-        squidActivity.putExtra("csh.neurodroid.NrnHome", NRNHOME);
+        squidActivity.putExtra("csh.neurodroid.nrnHomePath", nrnHomePath);
+        squidActivity.putExtra("csh.neurodroid.nrnBinPath", nrnBinPath);
+        squidActivity.putExtra("csh.neurodroid.cachePath", cacheDir.getPath());
         startActivity(squidActivity);
     }
 
     public void runHoc(String msg, String hocfile) {
+        runHoc(msg, hocfile, true);
+    }
+    
+    public void runHoc(String msg, String hocfile, final boolean stderr) {
         tv.setText(nrnversion + "\n" + msg);
         tv.invalidate();
         pd = ProgressDialog.show(this,
@@ -269,14 +282,18 @@ public class NeuroDroid extends Activity
         fHoc = hocfile;
         new Thread(new Runnable(){
                 public void run(){
-                    String bmfile = CACHEDIR + "/" + fHoc;
-                    String[] cmdlist = {NRNBIN, bmfile};
-                    nrnoutput = runBinary(cmdlist, NRNHOME, false);
+                    String bmfile = cacheDir.getPath() + "/" + fHoc;
+                    String[] cmdlist = {nrnBinPath, bmfile};
+                    nrnoutput = runNrn(cmdlist, stderr);
                     runOnUiThread(new Runnable(){
                             @Override public void run() {
                                 if (pd.isShowing())
                                     pd.dismiss();
-                                tv.setText(nrnversion + "\n" + nrnoutput);
+                                if (nrnoutput != null && !nrnoutput.equals("")) {
+                                    tv.setText(nrnoutput);
+                                } else {
+                                    tv.setText(nrnversion);
+                                }
                             }
                         });
                 }
@@ -320,7 +337,7 @@ public class NeuroDroid extends Activity
     }
 
     private void runTerm(Intent intent) {
-        String initCmd = "cd /data/data/csh.neurodroid/ && NEURONHOME=" + NRNHOME + " ./nrniv";
+        String initCmd = "cd /data/data/csh.neurodroid/ && NEURONHOME=" + nrnHomePath + " ./nrniv";
         intent.putExtra("jackpal.androidterm.iInitialCommand", initCmd);
         startActivity(intent);
     }
@@ -403,63 +420,6 @@ public class NeuroDroid extends Activity
         
     }
 
-    public static String runBinary(String[] binName, String nrnHome) {
-        return runBinary(binName, nrnHome, false);
-    }
-
-    /** Run a binary using binDir as the wd. Return stdout
-     *  and optinally stderr
-     */
-    public static String runBinary(String[] binName, String nrnHome, boolean stderr) {
-        try {
-            File binDir = new File(BINDIR);
-            if (!binDir.exists()) {
-                binDir.mkdirs();
-            }
-            
-            /* Can't set the environment on Android <= 2.2 with
-             * ProcessBuilder. Resorting back to old-school exec.
-             */
-            String[] envp = {"NEURONHOME="+nrnHome};
-            Process process = Runtime.getRuntime().exec(binName, envp, binDir);
-            process.waitFor();
-            
-            Scanner outscanner = new Scanner(process.getInputStream());
-            Scanner errscanner = new Scanner(process.getErrorStream());
-            String NL = System.getProperty("line.separator");
-            
-            String output = "";
-            
-            try {
-                while (outscanner.hasNextLine()) {
-                    output += outscanner.nextLine();
-                    output += NL;
-                }
-            }
-            finally {
-                outscanner.close();
-            }
-            if (stderr) {
-                output += NL + "stderr:" + NL;
-                try {
-                    while (errscanner.hasNextLine()) {
-                        output += errscanner.nextLine() + NL;
-                    }
-                }
-                finally {
-                    errscanner.close();
-                }
-            }
-
-            return output;
-
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
     public static ArrayList<Float> parseNrnOut(String nrnOut) {
         Scanner outscanner = new Scanner(nrnOut);
         int len = nrnOut.split("ND").length;
@@ -496,44 +456,29 @@ public class NeuroDroid extends Activity
      *  file in the assets
      */
     public void installStdLib() {
-        String newfn = CACHEDIR + "/lib.zip";
+        String newfn = cacheDir.getPath() + "/lib.zip";
         saveAssetsFile("lib.zip", newfn);
 
         UnZip u = new UnZip();
         u.setMode(UnZip.EXTRACT);
 
-        u.unZip(newfn, NRNHOME);
+        u.unZip(newfn, nrnHomePath);
 
         /* Make readable */
-        String[] chmodlist1 = {getChmod(), "755", BINDIR};
-        runBinary(chmodlist1, NRNHOME);
-
-        String[] chmodlist2 = {getChmod(), "755", NRNHOME};
-        runBinary(chmodlist2, NRNHOME);
-
-        String[] chmodlist3 = {getChmod(), "755", NRNHOME + "/lib"};
-        runBinary(chmodlist3, NRNHOME);
-
-        String[] chmodlist4 = {getChmod(), "755", NRNHOME + "/lib/hoc"};
-        runBinary(chmodlist4, NRNHOME);
-
-        /* Make cleanup executable */
-        String cleanup = NRNHOME + "/lib/cleanup";
-        String[] chmodlist6 = {getChmod(), "755", cleanup};
-        runBinary(chmodlist6, NRNHOME);
-    }
-
-    public static String getChmod() {
-        String chmod = "/system/bin/chmod";
-        if (!(new File(chmod)).exists()) {
-            chmod = "/system/xbin/chmod";
-            if (!(new File(chmod)).exists()) {
-                throw new RuntimeException("Couldn't find chmod on your system");
-            }
+        
+        try {
+            ShellUtils.chmod(nrnBinPath, "755");
+            ShellUtils.chmod(nrnHomePath, "755");
+            ShellUtils.chmod(nrnHomePath + "/lib", "755");
+            ShellUtils.chmod(nrnHomePath + "/lib/hoc", "755");
+            ShellUtils.chmod(nrnHomePath + "/lib/cleanup", "755");
+        } catch (IOException e) {
+            Log.e(TAG, e.getMessage());
+        } catch (InterruptedException e) {
+            Log.e(TAG, e.getMessage());
         }
-        return chmod;
     }
-    
+
     /* Called upon exit from the file dialog */
     public synchronized void onActivityResult(final int requestCode,
                                               int resultCode, final Intent data) {
@@ -550,13 +495,16 @@ public class NeuroDroid extends Activity
                      System.out.println("Loading...");
                  }
                      
-                 curHocFile = data.getStringExtra(FileDialog.RESULT_PATH);
+                 curHocFile = data.getStringExtra(FileDialog.RESULT_SELECTED_FILE);
                  Log.v(TAG, curHocFile);
                      
-                 String[] nrncmd = {NRNBIN, curHocFile};
-                 nrnoutput = runBinary(nrncmd, NRNHOME);
-                     
-                 tv.setText(nrnversion + "\n" + nrnoutput);
+                 String[] nrncmd = {nrnBinPath, curHocFile};
+                 nrnoutput = runNrn(nrncmd);
+                 if (nrnoutput != null && !nrnoutput.equals("")) {
+                     tv.setText(nrnoutput);
+                 } else {
+                     tv.setText(nrnversion);
+                 }
                      
              } else if (resultCode == Activity.RESULT_CANCELED) {
                  Log.v(TAG, "file not selected");
@@ -565,7 +513,7 @@ public class NeuroDroid extends Activity
          case REQUEST_PREFS:
              SharedPreferences prefs = getBaseContext().getSharedPreferences("csh.neurodroid_preferences", 0);
              boolean useVfp = prefs.getBoolean("cb_vfp", true);
-             cpNrnBin(useVfp && supportsVfp);
+             cpnrnBinPath(useVfp && supportsVfp);
              if (useVfp) {
                  Log.v(TAG, "Vfp enabled through options");
              } else {
@@ -580,14 +528,14 @@ public class NeuroDroid extends Activity
     }
 
     /** Copy nrniv to binDir and make executable */
-    public void cpNrnBin(boolean withVfp) {
+    public void cpnrnBinPath(boolean withVfp) {
         String arch = "armeabi";
         if (withVfp) {
             arch += "-v7a";
         }
-            
-        File binDir = new File(BINDIR);
+        binDir.mkdirs();
         if (!binDir.exists()) {
+            
             throw new RuntimeException("Couldn't find binary directory");
         }
 
@@ -596,7 +544,7 @@ public class NeuroDroid extends Activity
         try {
             String[] assetsFiles = getAssets().list(arch);
 
-            File newf = new File(NRNBIN);
+            File newf = new File(nrnBinPath);
             FileOutputStream os = new FileOutputStream(newf);
             for (String assetsFile : assetsFiles) {
                 Log.v(TAG, "Found NEURON binary part: " + assetsFile);
@@ -625,9 +573,14 @@ public class NeuroDroid extends Activity
                 .create();
         }
 
-        String[] chmodlist = {getChmod(), "755", NRNBIN};
-        runBinary(chmodlist, NRNHOME);
-    }
+        try {
+            ShellUtils.chmod(nrnBinPath, "755");
+        } catch (IOException e) {
+            Log.e(TAG, e.getMessage());
+        } catch (InterruptedException e) {
+            Log.e(TAG, e.getMessage());
+        }
+     }
 
     private static class AboutDialogBuilder {
         public static AlertDialog create(Context context) throws PackageManager.NameNotFoundException {
@@ -653,6 +606,24 @@ public class NeuroDroid extends Activity
                 setView(message).create();
         }
     }
+    
+    private String runNrn(String[] cmdList) {
+        return runNrn(cmdList, true);
+    }
+    
+    private String runNrn(String[] cmdList, boolean stderr) {
+        String nrnout = "";
+        String[] env = {"NEURONHOME", nrnHomePath};
+        try {
+            nrnout = ShellUtils.runBinary(cmdList, nrnHomePath, stderr, false, null, env);
+        } catch (IOException e) {
+            Log.e(TAG, e.getMessage());
+        } catch (InterruptedException e) {
+            Log.e(TAG, e.getMessage());
+        }
+        return nrnout;
+    }
+    
     /* Load libraries for native part of the app.
      */
     static {

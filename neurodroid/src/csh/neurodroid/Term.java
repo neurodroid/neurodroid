@@ -563,11 +563,10 @@ public class Term extends Activity implements UpdateCallback {
 
     private void doPaste() {
         ClipboardManager clip = (ClipboardManager)
-         getSystemService(Context.CLIPBOARD_SERVICE);
+        getSystemService(Context.CLIPBOARD_SERVICE);
         CharSequence paste = clip.getText();
-        byte[] utf8;
         try {
-            utf8 = paste.toString().getBytes("UTF-8");
+            paste.toString().getBytes("UTF-8");
         } catch (UnsupportedEncodingException e) {
             Log.e(TermDebug.LOG_TAG, "UTF-8 encoding not found.");
             return;

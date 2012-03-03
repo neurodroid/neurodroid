@@ -56,7 +56,9 @@
       android:id="@+id/txtOutput" 
       android:layout_width="fill_parent" 
       android:layout_height="wrap_content" 
-      android:typeface="normal">
+      android:typeface="normal"
+      android:scrollbars="vertical"
+      android:isScrollContainer="true">
   </TextView>
 
 </TableLayout>

@@ -31,8 +31,6 @@ import csh.neurodroid.util.UnicodeTranscript;
  * expose its internal data structures.
  */
 public class TranscriptScreen implements Screen {
-    private static final String TAG = "TranscriptScreen";
-
     /**
      * The width of the transcript, in characters. Fixed at initialization.
      */

@@ -29,6 +29,10 @@ import csh.neurodroid.session.TermSession;
  */
 public class SessionList extends ArrayList<TermSession>
 {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
     LinkedList<UpdateCallback> callbacks = new LinkedList<UpdateCallback>();
 
     public SessionList() {

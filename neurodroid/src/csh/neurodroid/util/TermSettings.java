@@ -44,8 +44,6 @@ public class TermSettings {
     private boolean mCloseOnExit;
 
     private static final String STATUSBAR_KEY = "statusbar";
-    private static final String CURSORSTYLE_KEY = "cursorstyle";
-    private static final String CURSORBLINK_KEY = "cursorblink";
     private static final String FONTSIZE_KEY = "fontsize";
     private static final String COLOR_KEY = "color";
     private static final String UTF8_KEY = "utf8_by_default";

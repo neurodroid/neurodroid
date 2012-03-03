@@ -18,18 +18,15 @@ package csh.neurodroid;
 
 import android.app.ListActivity;
 import android.content.ComponentName;
-import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.util.AttributeSet;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -80,34 +77,6 @@ public class WindowList extends ListActivity {
 
         public void onUpdate() {
             notifyDataSetChanged();
-        }
-    }
-
-    /**
-     * View which isn't automatically in the pressed state if its parent is
-     * pressed.  This allows the window's entry to be pressed without the close
-     * button being triggered.
-     * Idea and code shamelessly borrowed from the Android browser's tabs list.
-     */
-    private static class CloseButton extends ImageView {
-        public CloseButton(Context context) {
-            super(context);
-        }
-
-        public CloseButton(Context context, AttributeSet attrs) {
-            super(context, attrs);
-        }
-
-        public CloseButton(Context context, AttributeSet attrs, int style) {
-            super(context, attrs, style);
-        }
-
-        @Override
-        public void setPressed(boolean pressed) {
-            if (pressed && ((View) getParent()).isPressed()) {
-                return;
-            }
-            super.setPressed(pressed);
         }
     }
 

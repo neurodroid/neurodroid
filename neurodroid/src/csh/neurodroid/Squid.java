@@ -33,12 +33,14 @@ import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 
+import android.content.Context;
 import android.content.Intent;
 
 
 public class Squid extends Activity {
 
-    private String NRNBIN, NRNHOME, CACHEDIR, RAWHOC, RUNHOC;
+    private String nrnBinPath, nrnHomePath, rawHoc, runHoc;
+    private File cacheDir;
     private ProgressDialog pd;
     private String nrnoutput;
     private double mGna, mGk;
@@ -48,13 +50,14 @@ public class Squid extends Activity {
     @Override public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        NRNBIN = NeuroDroid.NRNBIN;
-        CACHEDIR = NeuroDroid.CACHEDIR;
-        RAWHOC = CACHEDIR + "/squid.hoc";
-        RUNHOC = CACHEDIR + "/squid_run.hoc";
-
         Intent intent = getIntent();
-        NRNHOME = intent.getStringExtra("csh.neurodroid.NrnHome");
+        nrnHomePath = intent.getStringExtra("csh.neurodroid.nrnHomePath");
+        nrnBinPath = intent.getStringExtra("csh.neurodroid.nrnBinPath");
+        String cachePath = intent.getStringExtra("csh.neurodroid.cachePath");
+        cacheDir = new File(cachePath);
+        rawHoc = cacheDir.getPath() + "/squid.hoc";
+        runHoc = cacheDir.getPath() + "/squid_run.hoc";
+
 
         setContentView(R.layout.squid);
 
@@ -110,14 +113,14 @@ public class Squid extends Activity {
 
     public String runSquid() {
         pd = ProgressDialog.show(this,
-                                 this.getString(R.string.wait_msg), 
-                                 this.getString(R.string.squid_msg), true);
+                this.getString(R.string.wait_msg), 
+                this.getString(R.string.squid_msg), true);
         new Thread(new Runnable(){
                 public void run(){
                     String initString = String.format("gna=%.4f\ngk=%.4f\n", mGna*1e-3, mGk*1e-3);
                     try {
-                        BufferedReader in = new BufferedReader(new FileReader(RAWHOC));
-                        BufferedWriter out = new BufferedWriter(new FileWriter(RUNHOC));
+                        BufferedReader in = new BufferedReader(new FileReader(rawHoc));
+                        BufferedWriter out = new BufferedWriter(new FileWriter(runHoc));
                         out.write(initString);
                         int c;
                         while ((c = in.read()) != -1)
@@ -126,11 +129,20 @@ public class Squid extends Activity {
                         in.close();
                         out.close();
                     } catch (IOException e) {
-                        Log.e(NeuroDroid.TAG, CACHEDIR + "/squid*.hoc");
+                        Log.e(NeuroDroid.TAG, cacheDir.getPath() + "/squid*.hoc");
                     }
-                    String[] cmdlist = {NRNBIN, RUNHOC};
+                    String[] cmdList = {nrnBinPath, runHoc};
                     // long time0 = System.currentTimeMillis();
-                    final String squidOut = NeuroDroid.runBinary(cmdlist, NRNHOME, false);
+                    String[] env= {"NEURONHOME", nrnHomePath};
+                    String squidOut = "";
+                    try {
+                        squidOut = ShellUtils.runBinary(cmdList, nrnHomePath, false, false, null, env);
+                    } catch (IOException e) {
+                        Log.e(NeuroDroid.TAG, e.getMessage());
+                    } catch (InterruptedException e) {
+                        Log.e(NeuroDroid.TAG, e.getMessage());
+                    }
+                    final String fSquidOut = squidOut;
                     // Log.v(NeuroDroid.TAG, String.format("Run neuron: %d ms", System.currentTimeMillis()-time0));
                     runOnUiThread(new Runnable(){
                             @Override public void run() {
@@ -138,7 +150,7 @@ public class Squid extends Activity {
                                     pd.dismiss();
                                 }
                                 // long time0 = System.currentTimeMillis();
-                                ArrayList<Float> values = NeuroDroid.parseNrnOut(squidOut);
+                                ArrayList<Float> values = NeuroDroid.parseNrnOut(fSquidOut);
                                 // Log.v(NeuroDroid.TAG, String.format("Parse neuron output: %d ms", System.currentTimeMillis()-time0));
                                 // time0 = System.currentTimeMillis();
                                 showGraph(values);
@@ -157,7 +169,7 @@ public class Squid extends Activity {
         graphActivity.putExtra("csh.neurodroid.grapharray", graphArray);
         /* Read default AP from file */
         try {
-            Scanner outscanner = new Scanner(new File(CACHEDIR + "/squid_std.txt"));
+            Scanner outscanner = new Scanner(new File(cacheDir.getPath() + "/squid_std.txt"));
             ArrayList<Float> stdArray = new ArrayList<Float>();
             try {
                 while (outscanner.hasNextLine()) {
@@ -173,7 +185,7 @@ public class Squid extends Activity {
             }
             graphActivity.putExtra("csh.neurodroid.stdarray", stdArray);
         } catch (IOException e) {
-            Log.e(NeuroDroid.TAG, CACHEDIR + "/squid_std.txt");
+            Log.e(NeuroDroid.TAG, cacheDir.getPath() + "/squid_std.txt");
         }
 
         startActivity(graphActivity);

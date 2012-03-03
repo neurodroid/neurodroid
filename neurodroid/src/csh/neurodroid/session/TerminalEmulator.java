@@ -171,12 +171,6 @@ public class TerminalEmulator {
     private static final int K_ORIGIN_MODE_MASK = 1 << 6;
 
     /**
-     * This mask indicates that wraparound mode is set. (As opposed to
-     * stop-at-right-column mode.)
-     */
-    private static final int K_WRAPAROUND_MODE_MASK = 1 << 7;
-
-    /**
      * Holds multiple DECSET flags. The data is stored this way, rather than in
      * separate booleans, to make it easier to implement the save-and-restore
      * semantics. The various k*ModeMask masks can be used to extract and modify
@@ -197,13 +191,6 @@ public class TerminalEmulator {
      * mode new characters are inserted, pushing existing text to the right.
      */
     private boolean mInsertMode;
-
-    /**
-     * Automatic newline mode. Configures whether pressing return on the
-     * keyboard automatically generates a return as well. Not currently
-     * implemented.
-     */
-    private boolean mAutomaticNewlineMode;
 
     /**
      * An array of tab stops. mTabStop[i] is true if there is a tab stop set for
@@ -1189,7 +1176,6 @@ public class TerminalEmulator {
             break;
 
         case 20:
-            mAutomaticNewlineMode = newValue;
             break;
 
         default:
@@ -1515,7 +1501,6 @@ public class TerminalEmulator {
         mDecFlags = 0;
         mSavedDecFlags = 0;
         mInsertMode = false;
-        mAutomaticNewlineMode = false;
         mTopMargin = 0;
         mBottomMargin = mRows;
         mAboutToAutoWrap = false;

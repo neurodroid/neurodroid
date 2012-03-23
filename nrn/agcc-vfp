@@ -41,9 +41,9 @@ chomp $GCC;
 # die "bad arm-linux-androideabi-gcc path" if $GCC !~ /(.*)\/prebuilt\//;
 my $HOME = $ENV{"HOME"};
 my $TARGET = "android-8";
-my $NDK = "$HOME/android-ndk-r7";
-my $TOOLCHAIN = "$HOME/android-toolchain";
-my $MSYSROOT = "$TOOLCHAIN/sysroot";
+my $NDK = "$HOME/android-ndk-r7b";
+my $TOOLCHAIN = "$NDK/toolchains/arm-linux-androideabi-4.4.3/prebuilt/linux-x86";
+my $MSYSROOT = "$NDK/platforms/android-8/arch-arm";
 
 my @include_paths = ("-I$MSYSROOT/usr/include");
 

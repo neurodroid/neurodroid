@@ -1,5 +1,6 @@
 #!/usr/bin/perl -w
 use strict;
+use Config;
 
 # Copyright 2008, Andrew Ross andy@plausible.org
 # Distributable under the terms of the GNU GPL, see COPYING for details
@@ -42,7 +43,8 @@ chomp $GCC;
 my $HOME = $ENV{"HOME"};
 my $TARGET = "android-8";
 my $NDK = "$HOME/android-ndk-r7b";
-my $TOOLCHAIN = "$NDK/toolchains/arm-linux-androideabi-4.4.3/prebuilt/linux-x86";
+my $HOST = $Config{osname};
+my $TOOLCHAIN = "$NDK/toolchains/arm-linux-androideabi-4.4.3/prebuilt/$HOST-x86";
 my $MSYSROOT = "$NDK/platforms/android-8/arch-arm";
 
 my @include_paths = ("-I$MSYSROOT/usr/include");

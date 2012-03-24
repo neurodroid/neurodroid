@@ -1,6 +1,5 @@
 #!/usr/bin/perl -w
 use strict;
-use Config;
 
 # Copyright 2008, Andrew Ross andy@plausible.org
 # Distributable under the terms of the GNU GPL, see COPYING for details
@@ -43,16 +42,15 @@ chomp $GCC;
 my $HOME = $ENV{"HOME"};
 my $TARGET = "android-8";
 my $NDK = "$HOME/android-ndk-r7b";
-my $HOST = $Config{osname};
-my $TOOLCHAIN = "$NDK/toolchains/arm-linux-androideabi-4.4.3/prebuilt/$HOST-x86";
-my $MSYSROOT = "$NDK/platforms/android-8/arch-arm";
+my $TOOLCHAIN = "$HOME/android-toolchain";
+my $MSYSROOT = "$TOOLCHAIN/sysroot";
 
 my @include_paths = ("-I$MSYSROOT/usr/include");
 
 my @preprocess_args = (
     "-DANDROID",
-    "-DNDEBUG",
-    "--sysroot=$MSYSROOT");
+    "-DNDEBUG");
+    # "--sysroot=$MSYSROOT");
 
 my @warn_args = (
     "-Wno-psabi"); # Implicit in -Wall per texinfo
@@ -60,15 +58,16 @@ my @warn_args = (
 my @compile_args = (
     "-MMD",
     "-MP",
+    "-MF".
     "-march=armv7-a",
     "-mfloat-abi=softfp",
-    "-mfpu=vfpv3-d16",
+    "-mfpu=vfp",
     "-mthumb-interwork",
     "-fpic",
-    "-fexceptions",
-    "-frtti",
     "-ffunction-sections",
-    "-funwind-tables"); # static exception-like tables
+    "-funwind-tables",
+    # "-fstack-protector",
+    "-Wa,--noexecstack" ); # check guard variable before return
 
 my @optimize_args = (
     "-O3",
@@ -82,8 +81,11 @@ my @optimize_args = (
     "-funswitch-loops");
 
 my @link_args = (
-    "-Wl,--sysroot=$MSYSROOT",
+    "-Wl,--gc-sections",
+    "-Wl,-z,nocopyreloc",
+    "--sysroot=$MSYSROOT",
     "$TOOLCHAIN/lib/gcc/arm-linux-androideabi/4.4.3/armv7-a/libgcc.a",
+    "-Wl,--fix-cortex-a8",
     "-Wl,--no-undefined",
     "-Wl,-z,noexecstack",
     "-lc",

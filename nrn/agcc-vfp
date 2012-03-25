@@ -50,7 +50,6 @@ my @include_paths = ("-I$MSYSROOT/usr/include");
 my @preprocess_args = (
     "-DANDROID",
     "-DNDEBUG");
-    # "--sysroot=$MSYSROOT");
 
 my @warn_args = (
     "-Wno-psabi"); # Implicit in -Wall per texinfo

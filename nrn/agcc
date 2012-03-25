@@ -53,8 +53,6 @@ my @preprocess_args = (
     "-D__ARM_ARCH_5TE__", # Already defined by toolchain
     "-DANDROID",
     "-DNDEBUG");
-    # "--sysroot=$MSYSROOT");
-    # "-include", "$DROID/system/core/include/arch/linux-arm/AndroidConfig.h",);
 
 my @warn_args = (
     "-Wno-psabi"); # Implicit in -Wall per texinfo
@@ -80,40 +78,26 @@ my @optimize_args = (
     "-fno-strict-aliasing");
 
 my @link_args = (
-    # "-Bdynamic",
-    # "-Wl,-T,$ARMELFDIR/armelf_linux_eabi.x",
-    # "-Wl,-dynamic-linker,/system/bin/linker",
     "-Wl,--gc-sections",
     "-Wl,-z,nocopyreloc",
     "--sysroot=$MSYSROOT",
-    # "-Wl,-rpath-link=$ALIB",
-    # "-L$MSYSROOT/usr/lib",
-    # "-nostdlib",
-    # "${MSYSROOT}/usr/lib/crtend_android.o",
-    # "${MSYSROOT}/usr/lib/crtbegin_static.o",
     "$TOOLCHAIN/lib/gcc/arm-linux-androideabi/4.4.3/libgcc.a",
     "-Wl,--no-undefined",
     "-Wl,-z,noexecstack",
-    # "-lgcc",
     "-lc",
     "-lm");
     
 # Also need: -Wl,-soname,libXXXX.so
 my @shared_args = (
-    # "-nostdlib",
-    # "-Wl,-T,$ARMELFDIR/armelf_linux_eabi.xsc",
     "-Wl,--sysroot=$MSYSROOT",
     "-Wl,--gc-sections",
     "-Wl,-shared,-Bsymbolic",
-    # "-L$MSYSROOT/usr/lib",
     "-Wl,--no-whole-archive",
     "-lc",
     "-lm",
     "-Wl,--no-undefined",
     "-Wl,-z,noexecstack",
     "$TOOLCHAIN/lib/gcc/arm-linux-androideabi/4.4.3/libgcc.a",
-    # "$NDK/sources/crystax/libs/x86/4.4.3/libcrystax_shared.a",
-    # "-lgcc",
     "-Wl,--whole-archive"); # .a, .o input files go *after* here
 
 # Now implement a quick parser for a gcc-like command line

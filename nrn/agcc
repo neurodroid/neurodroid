@@ -41,8 +41,8 @@ chomp $GCC;
 # die "bad arm-linux-androideabi-gcc path" if $GCC !~ /(.*)\/prebuilt\//;
 my $HOME = $ENV{"HOME"};
 my $TARGET = "android-8";
-my $NDK = "$HOME/android-ndk-r7b";
-my $TOOLCHAIN = "$HOME/android-toolchain";
+my $NDK = $ENV{"NDKDIR"};
+my $TOOLCHAIN = "$HOME/android-toolchain-crystax";
 my $MSYSROOT = "$TOOLCHAIN/sysroot";
 my @include_paths = ("-I$MSYSROOT/usr/include");
 
@@ -60,7 +60,6 @@ my @warn_args = (
 my @compile_args = (
     "-MMD",
     "-MP",
-    "-MF".
     "-march=armv5te",
     "-mtune=xscale",
     "-msoft-float",

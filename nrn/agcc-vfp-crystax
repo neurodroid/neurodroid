@@ -37,7 +37,7 @@ use strict;
 # deep, so links on $PATH are going to be common.
 my $HOME = $ENV{"HOME"};
 my $TARGET = "android-8";
-my $TOOLCHAIN = "$HOME/android-toolchain";
+my $TOOLCHAIN = "$HOME/android-toolchain-crystax";
 my $MSYSROOT = "$TOOLCHAIN/sysroot";
 my $GCC = "$TOOLCHAIN/bin/arm-linux-androideabi-gcc";
 

@@ -37,13 +37,17 @@ use strict;
 # deep, so links on $PATH are going to be common.
 my $HOME = $ENV{"HOME"};
 my $TARGET = "android-8";
-my $TOOLCHAIN = "$HOME/android-toolchain";
+my $TOOLCHAIN = "$HOME/android-toolchain-crystax";
 my $MSYSROOT = "$TOOLCHAIN/sysroot";
 my $GCC = "$TOOLCHAIN/bin/arm-linux-androideabi-gcc";
 
 my @include_paths = ("-I$MSYSROOT/usr/include");
 
 my @preprocess_args = (
+    "-D__ARM_ARCH_5__",
+    "-D__ARM_ARCH_5T__",
+    "-D__ARM_ARCH_5E__",
+    "-D__ARM_ARCH_5TE__", # Already defined by toolchain
     "-DANDROID",
     "-DNDEBUG");
 
@@ -53,10 +57,10 @@ my @warn_args = (
 my @compile_args = (
     "-MMD",
     "-MP",
-    "-march=armv7-a",
-    "-mfloat-abi=softfp",
-    "-mfpu=vfp",
-    "-mthumb-interwork",
+    "-march=armv5te",
+    "-mtune=xscale",
+    "-msoft-float",
+    "-mthumb",
     "-fpic",
     "-ffunction-sections",
     "-funwind-tables",
@@ -64,22 +68,16 @@ my @compile_args = (
     "-Wa,--noexecstack" ); # check guard variable before return
 
 my @optimize_args = (
-    "-O3",
-    "-finline-functions",
+    "-O2",
     "-finline-limit=64",
-    "-fgcse-after-reload",
-    "-frerun-cse-after-loop", # Implicit in -O2 per texinfo
-    "-frename-registers",
     "-fomit-frame-pointer",
-    "-fstrict-aliasing", # Implicit in -O2 per texinfo
-    "-funswitch-loops");
+    "-fno-strict-aliasing");
 
 my @link_args = (
     "-Wl,--gc-sections",
     "-Wl,-z,nocopyreloc",
     "--sysroot=$MSYSROOT",
-    "$TOOLCHAIN/lib/gcc/arm-linux-androideabi/4.4.3/armv7-a/libgcc.a",
-    "-Wl,--fix-cortex-a8",
+    "$TOOLCHAIN/lib/gcc/arm-linux-androideabi/4.4.3/libgcc.a",
     "-Wl,--no-undefined",
     "-Wl,-z,noexecstack",
     "-lc",
@@ -95,7 +93,7 @@ my @shared_args = (
     "-lm",
     "-Wl,--no-undefined",
     "-Wl,-z,noexecstack",
-    "$TOOLCHAIN/lib/gcc/arm-linux-androideabi/4.4.3/armv7-a/libgcc.a",
+    "$TOOLCHAIN/lib/gcc/arm-linux-androideabi/4.4.3/libgcc.a",
     "-Wl,--whole-archive"); # .a, .o input files go *after* here
 
 # Now implement a quick parser for a gcc-like command line

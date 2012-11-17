@@ -78,7 +78,7 @@ my @link_args = (
     "-Wl,--gc-sections",
     "-Wl,-z,nocopyreloc",
     "--sysroot=$MSYSROOT",
-    "$TOOLCHAIN/lib/gcc/arm-linux-androideabi/4.6.x-google/libgcc.a",
+    "$TOOLCHAIN/lib/gcc/arm-linux-androideabi/4.6/libgcc.a",
     "-Wl,--no-undefined",
     "-Wl,-z,noexecstack",
     "-lc",
@@ -94,7 +94,7 @@ my @shared_args = (
     "-lm",
     "-Wl,--no-undefined",
     "-Wl,-z,noexecstack",
-    "$TOOLCHAIN/lib/gcc/arm-linux-androideabi/4.6.x-google/libgcc.a",
+    "$TOOLCHAIN/lib/gcc/arm-linux-androideabi/4.6/libgcc.a",
     "-Wl,--whole-archive"); # .a, .o input files go *after* here
 
 # Now implement a quick parser for a gcc-like command line

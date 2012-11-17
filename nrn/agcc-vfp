@@ -55,7 +55,7 @@ my @compile_args = (
     "-MP",
     "-march=armv7-a",
     "-mfloat-abi=softfp",
-    "-mfpu=vfp",
+    "-mfpu=vfpv3-d16",
     "-mthumb-interwork",
     "-fpic",
     "-ffunction-sections",

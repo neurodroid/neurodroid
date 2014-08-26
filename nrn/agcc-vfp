@@ -36,7 +36,7 @@ use strict;
 # Dance around to find the actual android toolchain path (it's very
 # deep, so links on $PATH are going to be common.
 my $HOME = $ENV{"HOME"};
-my $TARGET = "android-8";
+my $TARGET = "android-15";
 my $TOOLCHAIN = "$HOME/android-toolchain";
 my $MSYSROOT = "$TOOLCHAIN/sysroot";
 my $GCC = "$TOOLCHAIN/bin/arm-linux-androideabi-gcc";
@@ -78,7 +78,7 @@ my @link_args = (
     "-Wl,--gc-sections",
     "-Wl,-z,nocopyreloc",
     "--sysroot=$MSYSROOT",
-    "$TOOLCHAIN/lib/gcc/arm-linux-androideabi/4.6/armv7-a/libgcc.a",
+    "$TOOLCHAIN/lib/gcc/arm-linux-androideabi/4.8/armv7-a/libgcc.a",
     "-Wl,--fix-cortex-a8",
     "-Wl,--no-undefined",
     "-Wl,-z,noexecstack",
@@ -95,7 +95,7 @@ my @shared_args = (
     "-lm",
     "-Wl,--no-undefined",
     "-Wl,-z,noexecstack",
-    "$TOOLCHAIN/lib/gcc/arm-linux-androideabi/4.6/armv7-a/libgcc.a",
+    "$TOOLCHAIN/lib/gcc/arm-linux-androideabi/4.8/armv7-a/libgcc.a",
     "-Wl,--whole-archive"); # .a, .o input files go *after* here
 
 # Now implement a quick parser for a gcc-like command line

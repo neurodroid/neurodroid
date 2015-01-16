@@ -65,9 +65,10 @@ my @compile_args = (
     "-fpic",
     "-ffunction-sections",
     "-funwind-tables",
-    # "-fstack-protector",
+    "-fstack-protector",
+    "-no-canonical-prefixes",
     "-Wa,--noexecstack" ); # check guard variable before return
-
+    
 my @optimize_args = (
     "-O2",
     "-finline-limit=64",

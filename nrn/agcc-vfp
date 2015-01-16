@@ -58,6 +58,7 @@ my @compile_args = (
     "-mfpu=vfpv3-d16",
     "-mthumb-interwork",
     "-fpic",
+    "-fPIE",
     "-ffunction-sections",
     "-funwind-tables",
     "-fstack-protector",
@@ -83,6 +84,8 @@ my @link_args = (
     "-Wl,--fix-cortex-a8",
     "-Wl,--no-undefined",
     "-Wl,-z,noexecstack",
+    "-Wl,-fPIE",
+    "-Wl,-pie",
     "-lc",
     "-lm");
     

@@ -84,8 +84,8 @@ my @link_args = (
     "-Wl,--fix-cortex-a8",
     "-Wl,--no-undefined",
     "-Wl,-z,noexecstack",
-    "-Wl,-fPIE",
-    "-Wl,-pie",
+    "-fPIE",
+    "-pie",
     "-lc",
     "-lm");
     

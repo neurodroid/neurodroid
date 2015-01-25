@@ -58,11 +58,11 @@ my @compile_args = (
     "-mfpu=vfpv3-d16",
     "-mthumb-interwork",
     "-fpic",
-    "-fPIE",
     "-ffunction-sections",
     "-funwind-tables",
-    "-fstack-protector",
-    "-no-canonical-prefixes",
+    # "-fstack-protector",
+    # "-no-canonical-prefixes",
+    # "-fPIE",
     "-Wa,--noexecstack" ); # check guard variable before return
 
 my @optimize_args = (
@@ -84,8 +84,8 @@ my @link_args = (
     "-Wl,--fix-cortex-a8",
     "-Wl,--no-undefined",
     "-Wl,-z,noexecstack",
-    "-fPIE",
-    "-pie",
+    # "-fPIE",
+    # "-pie",
     "-lc",
     "-lm");
     

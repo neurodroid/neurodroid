@@ -65,9 +65,9 @@ my @compile_args = (
     "-fpic",
     "-ffunction-sections",
     "-funwind-tables",
-    # "-fstack-protector",
-    # "-no-canonical-prefixes",
-    # "-fPIE",
+    "-fstack-protector",
+    "-no-canonical-prefixes",
+    "-fPIE",
     "-Wa,--noexecstack" ); # check guard variable before return
     
 my @optimize_args = (
@@ -83,8 +83,8 @@ my @link_args = (
     "$TOOLCHAIN/lib/gcc/arm-linux-androideabi/4.8/libgcc.a",
     "-Wl,--no-undefined",
     "-Wl,-z,noexecstack",
-    # "-fPIE",
-    # "-pie",
+    "-fPIE",
+    "-pie",
     "-lc",
     "-lm");
     
